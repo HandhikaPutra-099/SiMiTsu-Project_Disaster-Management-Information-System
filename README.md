@@ -1,1 +1,1 @@
-# SimiTsu---Global-Disaster-Alert-and-Coordination-System
+# SimiTsu-Global-Disaster-Alert-and-Coordination-System
