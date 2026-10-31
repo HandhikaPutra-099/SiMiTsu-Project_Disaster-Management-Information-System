@@ -12,13 +12,13 @@ simitsu-vscode/
 │   │   ├── style.css              # Tampilan utama
 │   │   └── responsive.css         # Penyesuaian tablet dan HP
 │   └── js/
-│       ├── data.js                # Data historis tsunami dan koordinat peta
+│       ├── data.js                # Catatan tsunami terverifikasi dari NOAA NCEI
 │       ├── history.js             # Pengisian tabel riwayat tsunami
 │       ├── simulator-controls.js  # Perhitungan parameter simulasi
 │       ├── quiz.js                # Kuis kesiapsiagaan
 │       ├── cause-animations.js    # Animasi penyebab tsunami
 │       ├── simulator-3d.js        # Visualisasi dan kontrol simulasi 3D
-│       ├── map.js                 # Peta, lempeng, dan layer sensor
+│       ├── map.js                 # Peta, lempeng, dan titik ilustrasi
 │       └── app.js                 # Inisialisasi dan event halaman
 └── README.md
 ```
@@ -63,3 +63,10 @@ simitsu-vscode/
 - Jangan mengubah ejaan atau huruf besar-kecil nama file di satu tempat saja. Jalur di `index.html` harus sesuai dengan nama file sebenarnya.
 - Semua library dan tile peta eksternal dimuat melalui CDN, jadi preview dan website perlu koneksi internet untuk fitur tersebut.
 - Script menggunakan urutan biasa (`defer`), bukan ES modules, agar fungsi yang dipanggil dari atribut `onclick` HTML tetap tersedia.
+
+## Data dan batas penggunaan
+
+- Tabel riwayat memuat catatan terpilih berstatus valid dari katalog tsunami NOAA NCEI. Tautan sumber tersedia pada setiap baris; daftar ini bukan katalog lengkap semua kejadian.
+- Titik yang ditampilkan pada layer sensor adalah ilustrasi statis, bukan lokasi sensor BMKG yang diverifikasi atau data operasional.
+- Angka simulator dihasilkan oleh rumus sederhana untuk edukasi. Angka dan kategori model bukan prakiraan, peringatan, atau panduan evakuasi.
+- Saat keadaan darurat, ikuti informasi dan instruksi resmi BMKG, BNPB, serta otoritas setempat.

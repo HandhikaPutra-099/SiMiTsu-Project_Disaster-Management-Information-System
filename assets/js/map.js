@@ -42,6 +42,7 @@
       var el = document.getElementById(btns[k]);
       if (!el) return;
       el.className = 'map-filter-btn' + (k === filter ? ' ' + classes[k] : '');
+      el.setAttribute("aria-pressed", String(k === filter));
     });
 
     // Update legend visibility
@@ -49,44 +50,79 @@
       var layer = li.getAttribute('data-layer');
       li.style.display = (filter === 'all' || filter === layer) ? '' : 'none';
     });
+
+    var emptyState = document.getElementById("mapEmptyState");
+    if (emptyState) {
+      var hasLayerData = filter === "all" ||
+        (filter === "plates" && mapLayerGroups.plates && mapLayerGroups.plates.getLayers().length > 0) ||
+        (filter === "tsunami" && mapLayerGroups.tsunami && mapLayerGroups.tsunami.getLayers().length > 0) ||
+        (filter === "sensor" && mapLayerGroups.sensor && mapLayerGroups.sensor.getLayers().length > 0);
+      emptyState.hidden = Boolean(hasLayerData);
+    }
   }
 
   function initLeafletMap() {
-    if (typeof L === "undefined") return;
+    var status = document.getElementById("mapStatus");
+    if (typeof L === "undefined") {
+      if (status) status.textContent = "Peta tidak dapat dimuat. Periksa koneksi internet atau coba muat ulang halaman.";
+      return;
+    }
+    if (typeof tsunamiEvents === "undefined" || !Array.isArray(tsunamiEvents)) {
+      if (status) status.textContent = "Catatan peta tidak dapat dimuat. Coba muat ulang halaman atau buka tabel riwayat.";
+      return;
+    }
     var map = L.map("leafletMap", {center:[-2.5,118], zoom:5, zoomControl:true});
     leafletMapRef = map;
 
-    L.tileLayer(
+    var baseLayer = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {attribution:"Tiles &copy; Esri &mdash; Source: Esri, USGS, GeoEye, and the GIS User Community", maxZoom:18}
-    ).addTo(map);
+    );
+    baseLayer.on("tileerror", function() {
+      if (status) status.textContent = "Latar peta gagal dimuat. Catatan historis tetap tersedia; periksa koneksi internet untuk melihat peta.";
+    });
+    baseLayer.addTo(map);
     L.tileLayer(
       "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
       {attribution:"", maxZoom:18, opacity:0.85, pane:"shadowPane"}
     ).addTo(map);
 
     setTimeout(function(){ map.invalidateSize(); }, 200);
+    map.whenReady(function() {
+      if (status) status.textContent = "Peta siap. Titik sensor adalah ilustrasi statis, bukan data lokasi sensor aktual.";
+    });
 
     // ══════════════════════════════════════════════════════════
     // LAYER 1 — TSUNAMI HISTORIS
     // ══════════════════════════════════════════════════════════
     var tsunamiLayer = L.layerGroup();
     tsunamiEvents.forEach(function(ev) {
-      var coords = eventCoords[ev.id]; if (!coords) return;
       var color = dotColor(ev.mag);
       var r = ev.mag>=8.5?14:ev.mag>=7.8?11:ev.mag>=7.0?9:7;
-      tsunamiLayer.addLayer(
-        L.circleMarker(coords, {
-          radius:r, fillColor:color, color:"#fff",
-          weight:1.5, opacity:1, fillOpacity:0.88
-        }).bindPopup(
-          "<strong>" + ev.name + " (" + ev.year + ")</strong>" +
-          "<br>Magnitudo: " + (ev.mag==="-"?"Vulkanik":"M"+ev.mag) +
-          "<br>Ketinggian Maks: " + (ev.height==="-"?"—":ev.height+" m") +
-          "<br>Korban: " + ev.victims +
-          "<br>Penyebab: " + ev.cause
-        )
+      var marker = L.circleMarker([ev.lat, ev.lng], {
+        radius:r, fillColor:color, color:"#fff",
+        weight:1.5, opacity:1, fillOpacity:0.88
+      }).bindPopup(
+        "<strong>" + ev.name + " (" + ev.year + ")</strong>" +
+        "<br>Magnitudo: " + (ev.mag==="-"?"Vulkanik":"M"+ev.mag) +
+        "<br>Ketinggian maksimum: " + (Number.isFinite(ev.height) ? ev.height + " m" : "Tidak tercatat") +
+        "<br>Korban meninggal: " + ev.victims.toLocaleString("id-ID") +
+        "<br>Penyebab: " + ev.cause
       );
+      marker.on("add", function() {
+        var element = marker.getElement();
+        if (!element) return;
+        element.setAttribute("role", "button");
+        element.setAttribute("aria-label", "Kejadian tsunami historis: " + ev.name + ", " + ev.year + ". Buka detail.");
+        element.setAttribute("tabindex", "0");
+        element.onkeydown = function(event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            marker.openPopup();
+          }
+        };
+      });
+      tsunamiLayer.addLayer(marker);
     });
     mapLayerGroups.tsunami = tsunamiLayer;
     tsunamiLayer.addTo(map);
@@ -193,55 +229,27 @@
     platesLayer.addTo(map);
 
     // ══════════════════════════════════════════════════════════
-    // LAYER 3 — SENSOR BMKG DI LAUT
-    // Sumber: BMKG InaTEWS, DART buoy network, tide gauges
+    // LAYER 3 — ILLUSTRATIVE POINTS
     // ══════════════════════════════════════════════════════════
     var sensorLayer = L.layerGroup();
 
-    // Sensor data: [lat, lng, type, name, desc]
-    // type: 'dart'=DART/OBP buoy, 'tide'=Tide Gauge, 'seis'=Seismograf bawah laut
+    // Positions are illustrative and do not represent verified sensor stations.
     var sensors = [
-      // DART / OBP Buoys (oceanic pressure sensors)
-      { lat:-6.5,  lng:100.5, type:"dart", name:"DART 53401",       desc:"Buoy tekanan bawah laut (OBP), Samudra Hindia barat Sumatera. Mendeteksi perubahan tekanan kolom air akibat tsunami." },
-      { lat:-8.0,  lng:106.5, type:"dart", name:"DART 56001",       desc:"Buoy DART di selatan Jawa, zona palung Sunda. Real-time data ke InaTEWS BMKG." },
-      { lat:-9.5,  lng:112.0, type:"dart", name:"DART 56002",       desc:"Buoy tekanan bawah laut di selatan Jawa Timur. Mendeteksi gelombang megathrust." },
-      { lat:-9.0,  lng:120.5, type:"dart", name:"DART 56003",       desc:"Buoy OBP selatan Nusa Tenggara. Mendukung peringatan tsunami regional." },
-      { lat:-10.5, lng:118.0, type:"dart", name:"DART 56004",       desc:"Buoy di palung Sumbawa — zona rawan megathrust." },
-      { lat:-7.5,  lng:129.0, type:"dart", name:"DART Banda",       desc:"Sensor tekanan Laut Banda, monitoring busur Banda." },
-      { lat:-2.5,  lng:130.5, type:"dart", name:"DART Maluku",      desc:"Buoy OBP utara Maluku, area pertemuan 3 lempeng." },
-      { lat:2.0,   lng:96.5,  type:"dart", name:"DART 23401",       desc:"Buoy DART barat laut Sumatera, jalur propagasi tsunami Aceh." },
-      { lat:-4.0,  lng:99.5,  type:"dart", name:"DART Mentawai",    desc:"OBP buoy kawasan Kepulauan Mentawai — zona megathrust aktif." },
-      { lat:0.5,   lng:124.5, type:"dart", name:"DART Sulawesi",    desc:"Sensor laut utara Sulawesi, dekat palung Sulawesi." },
-      { lat:-1.0,  lng:136.5, type:"dart", name:"DART Papua",       desc:"Buoy teluk Cenderawasih, Papua." },
-
-      // Tide Gauges — BMKG InaTEWS
-      { lat:3.3,   lng:95.3,  type:"tide", name:"Tide Gauge Sabang",       desc:"Stasiun tide gauge Sabang, Aceh. Titik terdepan monitoring tsunami Samudera Hindia." },
-      { lat:-5.4,  lng:105.3, type:"tide", name:"Tide Gauge Panjang",      desc:"Tide gauge Pelabuhan Panjang, Lampung. Monitoring Selat Sunda." },
-      { lat:-6.1,  lng:106.8, type:"tide", name:"Tide Gauge Tanjung Priok",desc:"Stasiun Jakarta — monitoring teluk Jakarta dan Laut Jawa." },
-      { lat:-7.2,  lng:112.7, type:"tide", name:"Tide Gauge Surabaya",     desc:"Tide gauge Tanjung Perak, monitoring Selat Madura." },
-      { lat:-8.7,  lng:115.2, type:"tide", name:"Tide Gauge Benoa",        desc:"Stasiun Bali, monitoring Samudera Hindia selatan Bali." },
-      { lat:-8.5,  lng:122.2, type:"tide", name:"Tide Gauge Maumere",      desc:"Tide gauge Maumere, NTT — area gempa Flores 1992." },
-      { lat:-0.9,  lng:119.8, type:"tide", name:"Tide Gauge Palu",         desc:"Stasiun Palu — pasca tsunami 2018, sistem monitoring ditingkatkan." },
-      { lat:-3.7,  lng:128.2, type:"tide", name:"Tide Gauge Ambon",        desc:"Tide gauge Ambon — monitoring Laut Banda dan Laut Seram." },
-      { lat:1.0,   lng:124.8, type:"tide", name:"Tide Gauge Manado",       desc:"Stasiun Manado, monitoring utara Sulawesi." },
-      { lat:-2.5,  lng:140.7, type:"tide", name:"Tide Gauge Jayapura",     desc:"Tide gauge Jayapura, Papua — monitoring Pasifik." },
-      { lat:-1.3,  lng:116.8, type:"tide", name:"Tide Gauge Balikpapan",   desc:"Monitoring Selat Makassar dan Kalimantan Timur." },
-      { lat:-8.5,  lng:116.1, type:"tide", name:"Tide Gauge Lombok",       desc:"Tide gauge pasca gempa Lombok 2018." },
-      { lat:-2.0,  lng:99.9,  type:"tide", name:"Tide Gauge Padang",       desc:"Stasiun Padang — garis terdepan monitoring megathrust Mentawai." },
-
-      // Seismograf bawah laut (OBS — Ocean Bottom Seismometer)
-      { lat:-5.0,  lng:102.5, type:"seis", name:"OBS Bengkulu",     desc:"Ocean Bottom Seismometer barat Bengkulu — monitoring subduksi Sumatera selatan." },
-      { lat:-8.5,  lng:108.0, type:"seis", name:"OBS Java Selatan", desc:"OBS di palung selatan Jawa Tengah." },
-      { lat:-9.2,  lng:114.0, type:"seis", name:"OBS Banyuwangi",   desc:"OBS selatan Banyuwangi, dekat segmen palung aktif." },
-      { lat:-9.8,  lng:119.0, type:"seis", name:"OBS Sumbawa",      desc:"OBS selatan Sumbawa, monitoring segmen subduksi NTB." },
-      { lat:0.0,   lng:122.5, type:"seis", name:"OBS Sulawesi Utara",desc:"OBS utara Sulawesi — monitoring seismik Laut Maluku." },
-      { lat:-3.5,  lng:135.0, type:"seis", name:"OBS Papua Barat",  desc:"OBS Teluk Bintuni, Papua Barat." },
+      { lat:-6.5, lng:100.5 }, { lat:-8.0, lng:106.5 }, { lat:-9.5, lng:112.0 },
+      { lat:-9.0, lng:120.5 }, { lat:-10.5, lng:118.0 }, { lat:-7.5, lng:129.0 },
+      { lat:-2.5, lng:130.5 }, { lat:2.0, lng:96.5 }, { lat:-4.0, lng:99.5 },
+      { lat:0.5, lng:124.5 }, { lat:-1.0, lng:136.5 }, { lat:3.3, lng:95.3 },
+      { lat:-5.4, lng:105.3 }, { lat:-6.1, lng:106.8 }, { lat:-7.2, lng:112.7 },
+      { lat:-8.7, lng:115.2 }, { lat:-8.5, lng:122.2 }, { lat:-0.9, lng:119.8 },
+      { lat:-3.7, lng:128.2 }, { lat:1.0, lng:124.8 }, { lat:-2.5, lng:140.7 },
+      { lat:-1.3, lng:116.8 }, { lat:-8.5, lng:116.1 }, { lat:-2.0, lng:99.9 },
+      { lat:-5.0, lng:102.5 }, { lat:-8.5, lng:108.0 }, { lat:-9.2, lng:114.0 },
+      { lat:-9.8, lng:119.0 }, { lat:0.0, lng:122.5 }, { lat:-3.5, lng:135.0 }
     ];
 
-    sensors.forEach(function(s) {
-      var color = s.type==="dart" ? "#0ea5e9" : s.type==="tide" ? "#22d3ee" : "#818cf8";
-      var iconLabel = s.type==="dart" ? "📡" : s.type==="tide" ? "🌊" : "📻";
-      var r = s.type==="dart" ? 9 : s.type==="tide" ? 7 : 6;
+    sensors.forEach(function(s, index) {
+      var color = "#0ea5e9";
+      var r = 7;
       var icon = L.divIcon({
         html: '<div style="position:relative;width:'+(r*2+6)+'px;height:'+(r*2+6)+'px;">' +
               '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
@@ -256,11 +264,8 @@
       sensorLayer.addLayer(
         L.marker([s.lat, s.lng], {icon: icon})
           .bindPopup(
-            '<strong style="color:'+color+'">'+iconLabel+' '+s.name+'</strong>' +
-            '<br><span style="color:#64748b;font-size:11px;text-transform:uppercase;font-weight:600;">' +
-            (s.type==="dart"?"DART/OBP Buoy":s.type==="tide"?"Tide Gauge BMKG":"Ocean Bottom Seismometer") +
-            '</span>' +
-            '<br><br>'+s.desc
+            '<strong style="color:'+color+'">Titik ilustrasi '+(index+1)+'</strong>' +
+            '<br>Posisi ini bukan lokasi sensor aktual dan tidak menampilkan data operasional.'
           )
       );
     });

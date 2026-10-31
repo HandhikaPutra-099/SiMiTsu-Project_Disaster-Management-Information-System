@@ -20,34 +20,21 @@
   function getPhaseDescriptions() {
     var s = simState;
     var coastName = {open:"pantai terbuka",bay:"teluk/muara",cliff:"tebing",mangrove:"mangrove"}[s.coast]||"pantai";
-    var timeNote = s.time==="night" ? " (⚠️ MALAM — visibilitas rendah!)" : "";
+    var timeNote = s.time==="night" ? " Skenario menggunakan waktu malam." : " Skenario menggunakan waktu siang.";
     var epiDist = s.dist < 50 ? "sangat dekat ("+s.dist+" km)" : s.dist < 150 ? "dekat ("+s.dist+" km)" : "jauh ("+s.dist+" km)";
-    var speedNote = s.speed > 600 ? "~800 km/jam" : s.speed > 300 ? "~"+s.speed+" km/jam" : "~"+s.speed+" km/jam (sudah dekat pantai)";
+    var speedNote = "~"+s.speed+" km/jam";
     return [
-      "Kondisi "+coastName+" normal"+timeNote+". Episentrum berjarak "+epiDist+". "+
-      "Waspada: gempa M"+s.mag.toFixed(1)+" berpotensi megathrust di zona "+({trench:"palung subduksi",shallow:"paparan benua",deep:"laut dalam"}[s.loc]||s.loc)+".",
+      "Kondisi ilustratif: "+coastName+" dan episentrum "+epiDist+"."+timeNote,
 
-      "⚡ GEMPA M"+s.mag.toFixed(1)+" terjadi pada kedalaman "+s.dep+" km! "+
-      (s.dep < 30 ? "Sangat dangkal — potensi tsunami EKSTREM." : s.dep < 70 ? "Kedalaman sedang — potensi tsunami besar." : "Kedalaman dalam — potensi tsunami menengah.")+
-      " Dasar laut terangkat, air bergolak di episentrum.",
+      "Tahap ilustrasi gempa M"+s.mag.toFixed(1)+" pada kedalaman "+s.dep+" km. Visual ini tidak menentukan potensi atau tingkat ancaman di lokasi nyata.",
 
-      "Gelombang terbentuk dari episentrum. Tinggi awal di laut dalam: "+Math.max(0.3,(s.height*0.08)).toFixed(1)+" m. "+
-      "Panjang gelombang ratusan km — tidak terlihat dari kapal. Energi merambat ke semua arah.",
+      "Tahap ilustrasi pembentukan gelombang. Nilai pada panel adalah keluaran rumus sederhana, bukan data observasi.",
 
-      "Propagasi "+speedNote+". "+
-      (s.loc==="trench" ? "Zona palung: kecepatan gelombang maksimum." : s.loc==="shallow" ? "Paparan benua: gelombang mulai melambat lebih awal." : "Laut dalam: kecepatan tinggi, tinggi masih rendah.")+
-      " Perkiraan tiba: "+s.eta+" menit.",
+      "Tahap ilustrasi propagasi dengan kecepatan model "+speedNote+". Waktu tempuh yang ditampilkan bukan estimasi waktu tiba yang dapat digunakan untuk evakuasi.",
 
-      "⚠️ Memasuki perairan dangkal di "+coastName+". "+
-      "Efek shoaling: kecepatan TURUN, tinggi NAIK. "+
-      ({open:"Pantai terbuka — gelombang langsung masuk.",bay:"Teluk — AMPLIFIKASI 1.8×! Sangat berbahaya.",cliff:"Tebing pantai — refleksi gelombang.",mangrove:"Mangrove meredam energi ~40%."}[s.coast]||"")+
-      (s.time==="night" ? " ⚠️ Malam: evakuasi lebih sulit!" : " Evakuasi sekarang!"),
+      "Tahap ilustrasi perubahan gelombang saat mendekati "+coastName+". Kondisi lokal dan dampaknya tidak dihitung secara resmi oleh simulasi ini.",
 
-      "🚨 GELOMBANG "+s.height.toFixed(1)+"m MENGHANTAM! Jangkauan daratan ~"+s.inland+" km. "+
-      (s.level==="extreme" ? "BAHAYA EKSTREM — kerusakan total zona merah." :
-       s.level==="high"    ? "PERINGATAN TINGGI — banjir besar." :
-       s.level==="medium"  ? "WASPADA — dampak menengah." : "RENDAH — dampak terbatas.")+
-      (s.time==="night" ? " Operasi SAR lebih sulit di malam hari." : ""),
+      "Tahap ilustrasi gelombang mencapai pantai. Untuk ancaman nyata, ikuti perintah resmi BMKG dan BNPB."
     ];
   }
 
@@ -65,6 +52,12 @@
     resize3d();
     window.addEventListener("resize", resize3d);
     sim3dCtx = sim3dCanvas.getContext("2d");
+    var status = document.getElementById("simulatorStatus");
+    if (!sim3dCtx) {
+      if (status) status.textContent = "Simulasi visual tidak tersedia di peramban ini. Baca catatan model dan panduan mitigasi di halaman.";
+      return;
+    }
+    if (status) status.textContent = "Simulasi siap. Visualisasi dan angka adalah ilustrasi edukatif, bukan informasi operasional.";
 
     sim3dCanvas.addEventListener("mousedown", function(e) {
       drag3d.active = true; drag3d.btn = e.button;
@@ -807,7 +800,7 @@
         if(fsP){
           var spAlpha = (0.4+Math.sin(sim3dT*6+fs)*0.3)*Math.min(1,waveH/10);
           ctx.fillStyle="rgba(255,255,255,"+spAlpha+")";
-          ctx.beginPath(); ctx.arc(fsP.x,fsP.y,1.5+Math.sin(sim3dT*3+fs)*2,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(fsP.x,fsP.y,Math.max(0.5,1.5+Math.sin(sim3dT*3+fs)*2),0,Math.PI*2); ctx.fill();
         }
       }
       // Wave crest ridge
@@ -820,16 +813,16 @@
       }
       ctx.stroke();
 
-      // Warning text scaled to level
+      // The color reflects only the illustrative model category.
       var warnColors = {extreme:"rgba(239,68,68,0.95)",high:"rgba(249,115,22,0.95)",medium:"rgba(245,158,11,0.9)",low:"rgba(34,197,94,0.85)"};
-      var warnTexts = {extreme:"🚨 BAHAYA EKSTREM — "+waveH.toFixed(1)+"m!",high:"⛔ DAMPAK TINGGI — "+waveH.toFixed(1)+"m",medium:"⚠️ DAMPAK SEDANG — "+waveH.toFixed(1)+"m",low:"ℹ️ DAMPAK KECIL — "+waveH.toFixed(1)+"m"};
+      var warnTexts = {extreme:"MODEL: ILUSTRASI SANGAT TINGGI",high:"MODEL: ILUSTRASI TINGGI",medium:"MODEL: ILUSTRASI MENENGAH",low:"MODEL: ILUSTRASI RENDAH"};
       ctx.fillStyle=warnColors[s.level]||warnColors.medium; ctx.font="bold 13px sans-serif";
       var warnP=project3D(36,waveH*0.45,0);
-      if(warnP) ctx.fillText(warnTexts[s.level]||"",warnP.x-70,warnP.y-12);
+      if(warnP) ctx.fillText(warnTexts[s.level]||"",warnP.x-90,warnP.y-12);
     }
 
     // ══════════════════════════════════════════════════════════
-    // HUD OVERLAY — live data from simState
+    // HUD overlay for educational model parameters.
     // ══════════════════════════════════════════════════════════
     // Left HUD box
     ctx.fillStyle="rgba(2,8,20,0.82)";
@@ -840,11 +833,11 @@
     ctx.fillText("FASE "+(currentPhase+1)+"/6",18,26);
     ctx.fillStyle="#f59e0b"; ctx.font="bold 11px sans-serif";
     ctx.fillText("M"+s.mag.toFixed(1)+" · "+s.dep+"km · "+s.dist+"km",18,42);
-    // Alert level bar
+    // Illustrative category bar
     var lvlColors={extreme:"#ef4444",high:"#f97316",medium:"#f59e0b",low:"#22c55e"};
     ctx.fillStyle=lvlColors[s.level]||"#f59e0b"; ctx.font="bold 10px sans-serif";
-    ctx.fillText(({extreme:"🚨 EKSTREM",high:"⛔ TINGGI",medium:"⚠️ SEDANG",low:"ℹ️ RENDAH"}[s.level]||""),18,58);
-    ctx.fillStyle="#64748b"; ctx.font="9px sans-serif";
+    ctx.fillText(({extreme:"MODEL: SANGAT TINGGI",high:"MODEL: TINGGI",medium:"MODEL: MENENGAH",low:"MODEL: RENDAH"}[s.level]||""),18,58);
+    ctx.fillStyle="#a8b4c6"; ctx.font="9px sans-serif";
     ctx.fillText("Drag: orbit  |  Scroll: zoom  |  Kanan: geser",18,72);
 
     // Right top: wave height + speed real-time
@@ -853,10 +846,10 @@
     ctx.fill();
     ctx.fillStyle="#0ea5e9"; ctx.font="bold 14px sans-serif"; ctx.textAlign="center";
     ctx.fillText(waveH.toFixed(1)+" m",W-54,28);
-    ctx.fillStyle="#64748b"; ctx.font="9px sans-serif";
-    ctx.fillText("Ketinggian Gelombang",W-54,40);
-    ctx.fillStyle="#94a3b8"; ctx.font="10px sans-serif";
-    ctx.fillText(s.speed+" km/j · ~"+s.eta+" mnt",W-54,54);
+    ctx.fillStyle="#a8b4c6"; ctx.font="9px sans-serif";
+    ctx.fillText("Tinggi ilustrasi",W-54,40);
+    ctx.fillStyle="#a8b4c6"; ctx.font="10px sans-serif";
+    ctx.fillText(s.speed+" km/j · ~"+s.eta+" mnt (model)",W-54,54);
     ctx.textAlign="left";
 
     // Compass (bottom right)
@@ -867,7 +860,7 @@
     ctx.beginPath(); ctx.moveTo(-14,0); ctx.lineTo(14,0); ctx.stroke();
     ctx.fillStyle="#ef4444"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
     ctx.fillText("U",0,-17);
-    ctx.fillStyle="#64748b";
+    ctx.fillStyle="#a8b4c6";
     ctx.fillText("S",0,24); ctx.fillText("B",-18,4); ctx.fillText("T",18,4);
     ctx.restore(); ctx.textAlign="left";
 
@@ -888,8 +881,13 @@
   }
 
   function setPhase(n) {
+    if (!Number.isInteger(n) || n < 0 || n > 5) return;
     currentPhase = n;
-    document.querySelectorAll(".phase-list li").forEach(function(li,i){ li.classList.toggle("active",i===n); });
+    document.querySelectorAll(".phase-list li").forEach(function(li, i) {
+      li.classList.toggle("active", i === n);
+      var button = li.querySelector("button");
+      if (button) button.setAttribute("aria-pressed", String(i === n));
+    });
     document.getElementById("phaseDesc").textContent = getPhaseDescriptions()[n];
   }
 

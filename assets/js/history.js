@@ -1,34 +1,61 @@
-// HISTORY TABLE — runs immediately since DOM is ready
-  // ══════════════════════════════════════════════════════════════
-  (function buildHistory() {
-    function getMagClass(m) {
-      if (m === "-") return "mag-low";
-      if (m >= 8.5)  return "mag-extreme";
-      if (m >= 7.8)  return "mag-high";
-      if (m >= 7.0)  return "mag-med";
-      return "mag-low";
-    }
-    function getMagLabel(m) {
-      if (m === "-") return "Vulkanik";
-      if (m >= 8.5)  return "Ekstrem";
-      if (m >= 7.8)  return "Besar";
-      if (m >= 7.0)  return "Menengah";
-      return "Kecil";
-    }
-    const tbody = document.getElementById("historyBody");
-    if (!tbody) return;
-    const sorted = [...tsunamiEvents].sort((a, b) => b.year - a.year);
-    sorted.forEach(ev => {
-      const tr = document.createElement("tr");
-      tr.innerHTML =
-        `<td><strong>${ev.year}</strong></td>` +
-        `<td>${ev.name}</td>` +
-        `<td><span class="badge-mag ${getMagClass(ev.mag)}">${ev.mag === "-" ? "—" : "M" + ev.mag} ${getMagLabel(ev.mag)}</span></td>` +
-        `<td>${ev.height === "-" ? "—" : ev.height + " m"}</td>` +
-        `<td style="color:${ev.victims === "N/A" ? "var(--muted)" : "var(--danger)"}">${ev.victims}</td>` +
-        `<td style="color:var(--muted)">${ev.cause}</td>`;
-      tbody.appendChild(tr);
-    });
-  })();
+(function buildHistory() {
+  const tbody = document.getElementById("historyBody");
+  const status = document.getElementById("historyStatus");
+  if (!tbody || !status) return;
 
-  // ══════════════════════════════════════════════════════════════
+  if (typeof tsunamiEvents === "undefined" || !Array.isArray(tsunamiEvents)) {
+    status.textContent = "Data riwayat tidak dapat dimuat. Coba muat ulang halaman atau buka katalog NOAA NCEI.";
+    return;
+  }
+
+  if (tsunamiEvents.length === 0) {
+    status.textContent = "Belum ada catatan tsunami terverifikasi untuk ditampilkan.";
+    return;
+  }
+
+  const sorted = [...tsunamiEvents].sort((a, b) => b.year - a.year);
+  sorted.forEach(ev => {
+    const row = document.createElement("tr");
+    const values = [
+      ev.year,
+      ev.name,
+      ev.mag === "-" ? "Tidak tersedia" : `M${ev.mag}`,
+      Number.isFinite(ev.height) ? `${ev.height} m` : "Tidak tercatat",
+      ev.victims.toLocaleString("id-ID"),
+      ev.cause,
+    ];
+
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 2) {
+        const badge = document.createElement("span");
+        badge.className = `badge-mag ${getMagClass(ev.mag)}`;
+        badge.textContent = value;
+        cell.replaceChildren(badge);
+      }
+      row.appendChild(cell);
+    });
+
+    const sourceCell = document.createElement("td");
+    const sourceLink = document.createElement("a");
+    sourceLink.href = `${tsunamiSourceUrl}${ev.sourceId}`;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noopener noreferrer";
+    sourceLink.textContent = "Sumber NOAA";
+    sourceLink.setAttribute("aria-label", `Buka catatan NOAA untuk tsunami ${ev.name}, ${ev.year}`);
+    sourceCell.appendChild(sourceLink);
+    row.appendChild(sourceCell);
+    tbody.appendChild(row);
+  });
+
+  status.textContent = `${sorted.length} catatan valid dari katalog NOAA NCEI. Angka korban adalah total korban meninggal pada catatan kejadian.`;
+
+  function getMagClass(magnitude) {
+    if (magnitude === "-") return "mag-low";
+    if (magnitude >= 8.5) return "mag-extreme";
+    if (magnitude >= 7.8) return "mag-high";
+    if (magnitude >= 7.0) return "mag-med";
+    return "mag-low";
+  }
+})();

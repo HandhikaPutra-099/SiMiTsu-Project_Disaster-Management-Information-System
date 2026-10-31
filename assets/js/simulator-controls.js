@@ -39,10 +39,10 @@
 
     // ── Alert level ───────────────────────────────────────────
     var level, alertClass, alertText;
-    if      (baseH >= 20) { level="extreme"; alertClass="extreme"; alertText="🚨 BAHAYA EKSTREM — Evakuasi Segera!"; }
-    else if (baseH >= 7)  { level="high";    alertClass="high";    alertText="⛔ PERINGATAN TINGGI — Segera Evakuasi!"; }
-    else if (baseH >= 2)  { level="medium";  alertClass="medium";  alertText="⚠️ WASPADA MENENGAH — Bersiap Evakuasi"; }
-    else                  { level="low";     alertClass="low";     alertText="ℹ️ WASPADA RENDAH — Pantau Informasi"; }
+    if      (baseH >= 20) { level="extreme"; alertClass="extreme"; alertText="Skenario model: kategori ilustrasi sangat tinggi. Ini bukan peringatan resmi."; }
+    else if (baseH >= 7)  { level="high";    alertClass="high";    alertText="Skenario model: kategori ilustrasi tinggi. Ini bukan peringatan resmi."; }
+    else if (baseH >= 2)  { level="medium";  alertClass="medium";  alertText="Skenario model: kategori ilustrasi menengah. Ini bukan peringatan resmi."; }
+    else                  { level="low";     alertClass="low";     alertText="Skenario model: kategori ilustrasi rendah. Ini bukan peringatan resmi."; }
 
     document.getElementById("alertBar").className   = "alert-bar " + alertClass;
     document.getElementById("alertBar").textContent  = alertText;
@@ -74,55 +74,29 @@
       if (baseH >= 7 && !autoPlayTimer) setPhase(0);
     }
 
-    // ── Mitigation steps ──────────────────────────────────────
-    var tp = time === "night" ? "⚠️ Malam hari: gunakan senter. " : "";
-    var tCoast = {
-      open:"Pantai terbuka — gelombang langsung masuk tanpa hambatan.",
-      bay:"Teluk/muara — energi gelombang TERKONSENTRASI, dampak hingga 1.8× lebih besar!",
-      cliff:"Tebing pantai — gelombang memantul, risiko lebih terlokalisir.",
-      mangrove:"Mangrove membantu MEREDAM energi gelombang hingga 40%."
-    }[coast] || "";
-
-    var steps = {
-      extreme:[
-        "🏃 LARI SEKARANG! Jangan ambil barang apapun.",
-        tp+"⛰️ Capai elevasi 30m dpl dalam <5 menit.",
-        "🌉 Hindari jembatan, tepi sungai, & muara.",
-        "🏢 Naik ke gedung beton lantai 4+ jika tak bisa lari keluar.",
-        "📢 Beritahu semua orang di sekitar Anda.",
-        "⏳ Jangan kembali minimal 3 jam meski air surut.",
-        "📞 Hubungi BNPB 117 & keluarga.",
-        "ℹ️ "+tCoast
-      ],
-      high:[
-        "🚶 Evakuasi segera tanpa menunggu sirine.",
-        tp+"🎒 Ambil Go Bag & pergi dalam <3 menit.",
-        "🚧 Ikuti jalur evakuasi yang bertanda.",
-        "👴 Bantu lansia, anak-anak, & disabilitas.",
-        "⏳ Tunggu minimal 3 jam di titik aman.",
-        "📻 Pantau BMKG, radio, & media resmi.",
-        "ℹ️ "+tCoast
-      ],
-      medium:[
-        "🎒 Siapkan tas darurat & dokumen penting.",
-        tp+"📡 Pantau BMKG & BNPB terus-menerus.",
-        "🚫 Jauhi pantai & muara sungai.",
-        "🗺️ Kenali jalur evakuasi terdekat.",
-        "📱 Hubungi & informasikan keluarga.",
-        "ℹ️ "+tCoast
-      ],
-      low:[
-        "📡 Pantau BMKG & BNPB secara berkala.",
-        "🚫 Jangan berenang saat ada notifikasi gempa.",
-        "🎒 Pastikan Go Bag sudah siap.",
-        "📢 Informasikan kepada tetangga.",
-        "ℹ️ "+tCoast
-      ]
+    // The scenario model is not suitable for generating real-world evacuation advice.
+    var coastNotes = {
+      open: "Pantai terbuka dipilih sebagai kondisi ilustrasi.",
+      bay: "Teluk atau muara dipilih sebagai kondisi ilustrasi.",
+      cliff: "Tebing pantai dipilih sebagai kondisi ilustrasi.",
+      mangrove: "Pantai bermangrove dipilih sebagai kondisi ilustrasi."
     };
     var list = document.getElementById("stepsList");
-    list.innerHTML = "";
-    (steps[level]||steps.low).forEach(function(s,i){
-      list.innerHTML += "<li><div class=\"step-num\">"+(i+1)+"</div><span>"+s+"</span></li>";
+    list.replaceChildren();
+    [
+      "Angka yang ditampilkan berasal dari rumus sederhana dan bukan prakiraan tsunami.",
+      "Model ini tidak menggantikan pemodelan resmi atau memperhitungkan seluruh kondisi setempat.",
+      coastNotes[coast] || "Kondisi pantai ilustratif.",
+      "Saat merasakan gempa kuat atau lama di dekat pantai, segera menjauh ke tempat aman dan ikuti informasi BMKG serta BNPB."
+    ].forEach(function(note, index) {
+      var item = document.createElement("li");
+      var number = document.createElement("div");
+      var text = document.createElement("span");
+      number.className = "step-num";
+      number.textContent = String(index + 1);
+      text.textContent = note;
+      item.append(number, text);
+      list.appendChild(item);
     });
   }
 

@@ -34,8 +34,13 @@
     var opts = document.querySelectorAll("#opts-"+qi+" .quiz-opt");
     opts.forEach(function(btn, i) {
       btn.disabled = true;
-      if (i === quizData[qi].ans) btn.classList.add("correct");
-      else if (i === oi)          btn.classList.add("wrong");
+      if (i === quizData[qi].ans) {
+        btn.classList.add("correct");
+        btn.textContent += i === oi ? " (jawaban Anda, benar)" : " (jawaban benar)";
+      } else if (i === oi) {
+        btn.classList.add("wrong");
+        btn.textContent += " (jawaban Anda)";
+      }
     });
     if (quizAnswers.every(function(a){ return a !== null; })) {
       var score = quizAnswers.filter(function(a,i){ return a === quizData[i].ans; }).length;
