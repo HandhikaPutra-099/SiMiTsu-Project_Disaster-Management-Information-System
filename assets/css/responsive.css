@@ -1,0 +1,253 @@
+/* ── RESPONSIVE LAYOUT: TABLET & MOBILE ── */
+    @media (max-width: 960px) {
+      .sim-panel {
+        position: static;
+        top: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      #threeCanvas {
+        height: min(58vw, 480px);
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      /* Navigation becomes a two-row bar with swipeable menu links. */
+      nav {
+        display: block;
+        height: auto;
+        min-height: 82px;
+        padding: 6px 12px 7px;
+      }
+
+      .nav-brand {
+        height: 29px;
+        gap: 7px;
+        font-size: 15px;
+      }
+
+      .nav-brand svg {
+        width: 23px;
+        height: 23px;
+      }
+
+      .nav-links {
+        display: flex;
+        width: 100%;
+        gap: 4px;
+        margin-top: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+
+      .nav-links::-webkit-scrollbar { display: none; }
+
+      .nav-links a {
+        flex: 0 0 auto;
+        padding: 6px 9px;
+        font-size: 11px;
+      }
+
+      section {
+        padding-top: 96px;
+      }
+
+      section[id] {
+        scroll-margin-top: 96px;
+      }
+
+      .section-inner {
+        padding: 20px 14px 36px;
+      }
+
+      .section-title {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 7px;
+        font-size: 19px;
+        line-height: 1.35;
+      }
+
+      .section-sub {
+        margin-bottom: 18px;
+        font-size: 12px;
+      }
+
+      /* Home / hero section */
+      #hero {
+        min-height: 100svh;
+        padding-top: 96px;
+      }
+
+      .hero-content {
+        width: 100%;
+        padding: 12px 18px 28px;
+      }
+
+      .hero-title {
+        font-size: clamp(29px, 8vw, 36px);
+        line-height: 1.16;
+        margin-bottom: 12px;
+      }
+
+      .hero-sub {
+        font-size: 13px;
+        margin-bottom: 22px;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        gap: 9px;
+      }
+
+      .hero-ctas .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+      }
+
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 10px;
+        margin-top: 26px;
+      }
+
+      .stat-item .val { font-size: 24px; }
+      .stat-item .lbl { font-size: 9px; }
+
+      /* Cards and grids */
+      .card-grid-2,
+      .card-grid-3,
+      .zone-grid,
+      .causes-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .card { padding: 16px; }
+      .cause-body { padding: 15px; }
+      .cause-body h3 { font-size: 15px; }
+      .cause-canvas-wrap canvas { height: 170px; }
+
+      /* Simulator controls and canvas */
+      .sim-unified-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .sim-panel {
+        padding: 14px;
+        border-radius: 10px;
+      }
+
+      .sim-panel h3 { font-size: 10px; }
+
+      .control-label {
+        gap: 10px;
+        font-size: 12px;
+      }
+
+      select {
+        min-height: 40px;
+        padding: 9px 10px;
+        font-size: 14px;
+      }
+
+      input[type=range] { height: 6px; }
+      input[type=range]::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+      }
+
+      #threeCanvas {
+        height: 330px;
+        min-height: 280px;
+        border-radius: 10px;
+        touch-action: none;
+      }
+
+      .sim3d-controls { gap: 5px; }
+      .ctrl-hint { font-size: 9px; }
+
+      .result-body { padding: 12px; }
+
+      .result-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .result-item { padding: 9px; }
+      .result-item .r-label { font-size: 9px; }
+      .result-item .r-val { font-size: 16px; }
+      .alert-bar { padding: 10px 12px; font-size: 12px; }
+
+      /* Map */
+      #leafletMap {
+        height: 360px;
+        min-height: 300px;
+      }
+
+      .map-filter-bar {
+        gap: 6px;
+      }
+
+      .map-filter-bar .filter-label {
+        width: 100%;
+        margin-bottom: 1px;
+      }
+
+      .map-filter-btn {
+        padding: 7px 9px;
+        font-size: 10px;
+      }
+
+      .map-legend {
+        gap: 9px 12px;
+        padding: 10px;
+      }
+
+      .legend-item { font-size: 10px; }
+
+      /* Readable tables, quiz, and footer */
+      .table-wrap { -webkit-overflow-scrolling: touch; }
+      table { min-width: 650px; font-size: 12px; }
+      th, td { padding: 9px 10px; }
+
+      .quiz-q { padding: 15px; }
+      .quiz-opt { min-height: 42px; }
+      #quizScore { padding: 18px; }
+
+      footer {
+        padding: 20px 14px;
+        font-size: 11px;
+        overflow-wrap: anywhere;
+      }
+
+      .scroll-top {
+        width: 42px;
+        height: 42px;
+        right: 14px;
+        bottom: 14px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .section-inner { padding-left: 11px; padding-right: 11px; }
+      .hero-content { padding-left: 14px; padding-right: 14px; }
+      #threeCanvas { height: 290px; }
+      #leafletMap { height: 320px; }
+      .map-filter-btn { font-size: 9px; padding: 6px 7px; }
+    }
