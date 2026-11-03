@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 const causes = [
   {
     title: "Gempa subduksi",
@@ -22,12 +24,47 @@ const causes = [
 ];
 
 export default function DisasterEducation() {
+  const [pausedCauses, setPausedCauses] = useState([true, true, true, true]);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function updateMotionPreference(event: MediaQueryListEvent) {
+      setReducedMotion(event.matches);
+      if (event.matches) setPausedCauses([true, true, true, true]);
+    }
+
+    preference.addEventListener("change", updateMotionPreference);
+    return () => preference.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  function toggleCause(index: number) {
+    const shouldPause = !pausedCauses[index];
+    if (shouldPause) {
+      window.pauseCause?.(index);
+    } else {
+      window.replayCause?.(index);
+    }
+    setPausedCauses((previous) => previous.map((isPaused, causeIndex) =>
+      causeIndex === index ? shouldPause : isPaused
+    ));
+  }
+
+  function replayCause(index: number) {
+    window.replayCause?.(index);
+    setPausedCauses((previous) => previous.map((isPaused, causeIndex) =>
+      causeIndex === index ? false : isPaused
+    ));
+  }
+
   return (
-    <section id="causes">
+    <section id="education" className="education-section">
       <div className="section-inner">
-        <h2 className="section-title">Bagaimana tsunami terjadi</h2>
+        <h2 className="section-title">Pahami penyebab tsunami</h2>
         <p className="section-sub">
-          Pilih ringkasan pada tiap animasi untuk melihat penjelasan singkat tentang pemindahan air laut.
+          Gempa bumi, aktivitas gunung api, dan longsor bawah laut dapat memindahkan air laut. Ringkasan menjelaskan tiap proses.
         </p>
         <div className="causes-grid">
           {causes.map((cause, index) => (
@@ -42,16 +79,33 @@ export default function DisasterEducation() {
                 >
                   {cause.label}
                 </canvas>
-                <button
-                  className="play-btn"
-                  type="button"
-                  onClick={() => window.replayCause?.(index)}
-                >
-                  Putar ulang
-                </button>
               </div>
               <div className="cause-body">
                 <h3>{cause.title}</h3>
+                {reducedMotion ? (
+                  <p className="cause-motion-note">
+                    Skema tetap ditampilkan. Animasi bergerak nonaktif sesuai preferensi perangkat.
+                  </p>
+                ) : (
+                  <div className="cause-controls">
+                    <button
+                      className="cause-control"
+                      type="button"
+                      aria-label={`Putar ulang animasi: ${cause.title}`}
+                      onClick={() => replayCause(index)}
+                    >
+                      Putar ulang animasi
+                    </button>
+                    <button
+                      className="cause-control"
+                      type="button"
+                      aria-label={`${pausedCauses[index] ? "Putar" : "Jeda"} animasi: ${cause.title}`}
+                      onClick={() => toggleCause(index)}
+                    >
+                      {pausedCauses[index] ? "Putar animasi" : "Jeda animasi"}
+                    </button>
+                  </div>
+                )}
                 <details className="cause-info">
                   <summary>Baca ringkasan</summary>
                   <p>{cause.description}</p>

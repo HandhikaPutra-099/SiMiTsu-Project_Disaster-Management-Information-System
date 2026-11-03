@@ -906,6 +906,10 @@
     }, 4500);
   }
 
+  function pauseAutoPlay3D() {
+    if (autoPlayTimer) { clearInterval(autoPlayTimer); autoPlayTimer = null; }
+  }
+
   function resetPhase() {
     if (autoPlayTimer) { clearInterval(autoPlayTimer); autoPlayTimer = null; }
     setPhase(0);

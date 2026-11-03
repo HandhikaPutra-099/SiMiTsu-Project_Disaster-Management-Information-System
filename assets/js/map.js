@@ -64,11 +64,17 @@
   function initLeafletMap() {
     var status = document.getElementById("mapStatus");
     if (typeof L === "undefined") {
-      if (status) status.textContent = "Peta tidak dapat dimuat. Periksa koneksi internet atau coba muat ulang halaman.";
+      if (status) {
+        status.textContent = "Peta tidak dapat dimuat. Periksa koneksi internet atau coba muat ulang halaman.";
+        status.hidden = false;
+      }
       return;
     }
     if (typeof tsunamiEvents === "undefined" || !Array.isArray(tsunamiEvents)) {
-      if (status) status.textContent = "Catatan peta tidak dapat dimuat. Coba muat ulang halaman atau buka tabel riwayat.";
+      if (status) {
+        status.textContent = "Catatan peta tidak dapat dimuat. Coba muat ulang halaman atau buka Database.";
+        status.hidden = false;
+      }
       return;
     }
     var map = L.map("leafletMap", {center:[-2.5,118], zoom:5, zoomControl:true});
@@ -76,10 +82,13 @@
 
     var baseLayer = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      {attribution:"Tiles &copy; Esri &mdash; Source: Esri, USGS, GeoEye, and the GIS User Community", maxZoom:18}
+      {attribution:"Tiles &copy; Esri. Source: Esri, USGS, GeoEye, and the GIS User Community", maxZoom:18}
     );
     baseLayer.on("tileerror", function() {
-      if (status) status.textContent = "Latar peta gagal dimuat. Catatan historis tetap tersedia; periksa koneksi internet untuk melihat peta.";
+      if (status) {
+        status.textContent = "Latar peta gagal dimuat. Catatan historis tetap tersedia; periksa koneksi internet untuk melihat peta.";
+        status.hidden = false;
+      }
     });
     baseLayer.addTo(map);
     L.tileLayer(
@@ -89,7 +98,7 @@
 
     setTimeout(function(){ map.invalidateSize(); }, 200);
     map.whenReady(function() {
-      if (status) status.textContent = "Peta siap. Titik sensor adalah ilustrasi statis, bukan data lokasi sensor aktual.";
+      if (status) status.hidden = true;
     });
 
     // ══════════════════════════════════════════════════════════
@@ -144,7 +153,7 @@
       [-9.8,112.5],[-9.8,114.5],[-9.5,116.5],[-9.8,118.5],[-10.0,120.5],
       [-10.2,122.0],[-10.0,124.0]
     ], {color:"#ff6b00",weight:4,opacity:0.95,dashArray:"12,5"},
-       "🔶 Palung Sunda (Java Trench) — Zona Megathrust Utama");
+       "Garis ilustratif: Palung Sunda (Java Trench)");
     plateLabel(platesLayer, map, -9.0, 109.5, "PALUNG SUNDA", "#ff6b00");
 
     // 2. Banda Arc
@@ -153,7 +162,7 @@
       [-7.0,130.0],[-5.5,131.5],[-4.5,132.5],[-3.5,133.5],
       [-2.5,134.5],[-1.5,135.5],[-0.5,136.5],[0.5,137.5]
     ], {color:"#ff6b00",weight:3,opacity:0.9,dashArray:"8,5"},
-       "🔶 Busur Banda — Batas Konvergen");
+       "Garis ilustratif: Busur Banda");
     plateLabel(platesLayer, map, -4.0, 131.5, "BUSUR BANDA", "#ff6b00");
 
     // 3. Philippine Plate
@@ -162,7 +171,7 @@
       [2.0,125.5],[0.5,126.0],[-1.0,126.5],[-2.0,127.0],
       [-3.0,127.5],[-4.0,128.0]
     ], {color:"#8b5cf6",weight:3,opacity:0.9,dashArray:"6,4"},
-       "🟣 Batas Lempeng Filipina");
+       "Garis ilustratif: batas Lempeng Filipina");
     plateLabel(platesLayer, map, 3.0, 126.2, "LEMPENG FILIPINA", "#8b5cf6");
 
     // 4. North Sulawesi Trench
@@ -170,7 +179,7 @@
       [4.5,124.0],[3.5,124.5],[2.5,125.0],[1.5,125.5],
       [0.5,126.5],[-0.5,127.0],[-1.5,127.5],[-2.0,128.5]
     ], {color:"#8b5cf6",weight:2.5,opacity:0.9,dashArray:"6,4"},
-       "🟣 Palung Sulawesi Utara");
+       "Garis ilustratif: Palung Sulawesi Utara");
     plateLabel(platesLayer, map, 2.5, 124.8, "PALUNG SULAWESI", "#8b5cf6");
 
     // 5. Australian Plate (PNG)
@@ -178,7 +187,7 @@
       [-4.5,141.0],[-5.0,143.0],[-5.5,145.0],[-6.0,147.0],
       [-6.5,149.5],[-7.0,152.0],[-7.5,155.0]
     ], {color:"#22c55e",weight:3,opacity:0.9,dashArray:"8,4"},
-       "🟢 Batas Lempeng Australia — konvergen dengan PNG");
+       "Garis ilustratif: batas Lempeng Australia dengan Papua Nugini");
     plateLabel(platesLayer, map, -6.0, 145.5, "LEMPENG AUSTRALIA", "#22c55e");
 
     // 6. Australia–Eurasia south of Timor
@@ -186,7 +195,7 @@
       [-10.5,124.0],[-11.0,126.0],[-11.5,128.0],[-12.0,130.0],
       [-12.5,132.0],[-13.0,134.0],[-13.0,136.0],[-12.5,138.0]
     ], {color:"#22c55e",weight:2.5,opacity:0.85,dashArray:"6,4"},
-       "🟢 Lempeng Australia — batas selatan Timor");
+       "Garis ilustratif: batas Lempeng Australia di selatan Timor");
 
     // 7. Sumatera Fault
     addPlate([
@@ -194,7 +203,7 @@
       [0.5,98.0],[-0.5,98.5],[-1.5,99.0],[-2.5,99.5],[-3.5,100.0],
       [-4.5,101.0],[-5.5,102.0],[-5.8,103.5]
     ], {color:"#f59e0b",weight:2.5,opacity:0.85,dashArray:"4,4"},
-       "🟡 Sesar Besar Sumatera (Dextral Strike-Slip)");
+       "Garis ilustratif: Sesar Besar Sumatera");
     plateLabel(platesLayer, map, 1.0, 97.8, "SESAR SUMATERA", "#f59e0b");
 
     // 8. Palu-Koro
@@ -202,7 +211,7 @@
       [1.5,120.0],[1.0,120.2],[0.5,120.0],[0.0,119.9],
       [-0.5,119.8],[-1.0,119.8],[-1.5,120.2],[-2.0,120.5]
     ], {color:"#f59e0b",weight:2.5,opacity:0.9,dashArray:"4,3"},
-       "🟡 Sesar Palu-Koro — Penyebab Tsunami Palu 2018");
+       "Garis ilustratif: Sesar Palu-Koro");
     plateLabel(platesLayer, map, 0.0, 120.5, "SESAR PALU-KORO", "#f59e0b");
 
     // 9. Sorong Fault
@@ -210,7 +219,7 @@
       [-1.0,131.0],[-0.5,132.5],[0.0,134.0],[0.5,135.5],
       [0.8,137.0],[1.0,138.5],[1.0,140.5]
     ], {color:"#f59e0b",weight:2,opacity:0.8,dashArray:"4,4"},
-       "🟡 Sesar Sorong");
+       "Garis ilustratif: Sesar Sorong");
     plateLabel(platesLayer, map, 0.5, 135.5, "SESAR SORONG", "#f59e0b");
 
     // 10. Flores Back-Arc Thrust
@@ -218,7 +227,7 @@
       [-7.5,117.0],[-8.0,119.0],[-8.2,121.0],
       [-8.0,123.0],[-7.5,124.5]
     ], {color:"#60a5fa",weight:2,opacity:0.8,dashArray:"5,3"},
-       "🔵 Sesar Flores — Penyebab Gempa Flores 1992 & Lombok 2018");
+       "Garis ilustratif: Sesar Flores");
     plateLabel(platesLayer, map, -8.0, 120.5, "SESAR FLORES", "#60a5fa");
 
     // Plate name labels
@@ -257,7 +266,7 @@
               'border:2px solid #fff;z-index:2;"></div>' +
               '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
               'width:'+(r*2+6)+'px;height:'+(r*2+6)+'px;border-radius:50%;background:'+color+';' +
-              'opacity:0.3;animation:sensor-pulse 2s ease-in-out infinite;"></div>' +
+              'opacity:0.3;"></div>' +
               '</div>',
         className: '', iconAnchor: [r+3, r+3]
       });
@@ -275,6 +284,8 @@
 
     // Set initial filter state (all visible, "Semua" button active)
     setMapFilter('all');
+    window.__simitsuMapReady = true;
+    window.dispatchEvent(new Event("simitsu:mapready"));
   }
 
   // ══════════════════════════════════════════════════════════════

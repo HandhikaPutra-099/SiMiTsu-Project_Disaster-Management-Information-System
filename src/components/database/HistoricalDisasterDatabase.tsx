@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { ExternalLink, Filter, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import AnalyticsSummary from "./AnalyticsSummary";
 import {
   tsunamiCatalogUrl,
   tsunamiEvents,
@@ -81,10 +82,11 @@ export default function HistoricalDisasterDatabase() {
   return (
     <section id="database" className="database-section">
       <div className="section-inner">
-        <h2 className="section-title">Database bencana</h2>
+        <h2 className="section-title">Catatan tsunami historis</h2>
         <p className="section-sub">
-          Telusuri catatan tsunami Indonesia pilihan dari katalog NOAA NCEI. Arsip ini berisi kejadian historis, bukan pemantauan waktu nyata.
+          Saring catatan pilihan dari katalog NOAA NCEI. Arsip ini bukan pemantauan waktu nyata dan tidak mencakup seluruh kejadian.
         </p>
+        <AnalyticsSummary />
 
         <div className="database-filters" role="group" aria-label="Filter arsip tsunami">
           <label htmlFor="databaseSearch">

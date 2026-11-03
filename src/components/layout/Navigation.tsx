@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 
 const links = [
   ["Beranda", "#hero"],
-  ["Penyebab", "#causes"],
+  ["Edukasi", "#education"],
+  ["Peta Bencana", "#map"],
   ["Simulator", "#simulator"],
-  ["Peta", "#map"],
   ["Database", "#database"],
-  ["Riwayat", "#history"],
   ["Mitigasi", "#mitigation"],
 ] as const;
 
 export default function Navigation() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     function updateScrollState() {
@@ -36,10 +36,24 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", updateScrollState);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        document.querySelector<HTMLButtonElement>(".nav-menu-toggle")?.focus();
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
   return (
     <>
       <a className="skip-link" href="#main-content">Lewati ke konten utama</a>
-      <header>
+      <header className="site-header">
         <nav aria-label="Navigasi utama">
           <a className="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
             <svg aria-hidden="true" focusable="false" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,13 +63,23 @@ export default function Navigation() {
             </svg>
             <span>SIMITSU</span>
           </a>
-          <div className="nav-links">
+          <button
+            className="nav-menu-toggle"
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setMenuOpen((isOpen) => !isOpen)}
+          >
+            Bagian
+          </button>
+          <div className={`nav-links${menuOpen ? " is-open" : ""}`} id="primary-navigation">
             {links.map(([label, href]) => (
               <a
                 key={href}
                 href={href}
                 className={activeSection === href.slice(1) ? "active" : undefined}
                 aria-current={activeSection === href.slice(1) ? "location" : undefined}
+                onClick={() => setMenuOpen(false)}
               >
                 {label}
               </a>

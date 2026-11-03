@@ -37,6 +37,7 @@ Reading this as: a tsunami education homepage for the Indonesian public, in a sc
 - The dark ocean palette preserves SiMiTsu's established identity and keeps scientific map and simulator surfaces visually coherent.
 - Blue marks water and primary interface focus; orange marks caution and selective emphasis; risk colors remain reserved for explicitly labeled risk categories.
 - The system sans-serif keeps the static site readable without adding a remote font dependency.
-- The home composition pairs the headline and actions with the existing Leaflet map because geographic context is the product's main entry point.
+- The home composition leads with a concise introduction and routes visitors to the dedicated map and mitigation sections; this keeps the first screen focused while preserving fast access to the primary tools.
+- The hero cross-section uses the established blue and orange palette to explain seafloor uplift and wave direction, with a visible caption identifying it as conceptual rather than operational.
 - Editorial sections use headings, paragraphs, and lists so maps, records, and explanations do not all become interchangeable cards.
 - Low-motion presentation keeps attention on the data; existing simulations and animations remain available for intentional interaction.

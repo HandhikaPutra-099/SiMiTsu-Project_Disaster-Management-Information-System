@@ -4,14 +4,40 @@
   var causeCtx = [null, null, null, null];
   var causeW   = [0, 0, 0, 0];
   var causeH   = [0, 0, 0, 0];
-  var reduceCauseMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var causePaused = [true, true, true, true];
+  var causeTicks = [];
+  var causeMotionPreference = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var reduceCauseMotion = Boolean(causeMotionPreference && causeMotionPreference.matches);
 
-  function scheduleCauseFrame(tick) {
-    if (!reduceCauseMotion) requestAnimationFrame(tick);
+  function updateCauseMotionPreference(event) {
+    reduceCauseMotion = event.matches;
+    if (reduceCauseMotion) {
+      for (var index = 0; index < causePaused.length; index++) causePaused[index] = true;
+    }
+  }
+
+  if (causeMotionPreference) {
+    if (causeMotionPreference.addEventListener) {
+      causeMotionPreference.addEventListener("change", updateCauseMotionPreference);
+    } else {
+      causeMotionPreference.addListener(updateCauseMotionPreference);
+    }
+  }
+
+  function scheduleCauseFrame(tick, index) {
+    if (!reduceCauseMotion && !causePaused[index]) requestAnimationFrame(tick);
   }
 
   function replayCause(idx) {
-    if (Number.isInteger(idx) && idx >= 0 && idx < causeT.length) causeT[idx] = 0;
+    if (Number.isInteger(idx) && idx >= 0 && idx < causeT.length) {
+      causePaused[idx] = false;
+      causeT[idx] = 0;
+      if (causeTicks[idx]) causeTicks[idx]();
+    }
+  }
+
+  function pauseCause(idx) {
+    if (Number.isInteger(idx) && idx >= 0 && idx < causePaused.length) causePaused[idx] = true;
   }
 
   function initCauseAnimations() {
@@ -34,7 +60,8 @@
 
     // ── Animasi 0: Gempa Subduksi ────────────────────────────────
     (function tick() {
-      var ctx = causeCtx[0]; if (!ctx) { scheduleCauseFrame(tick); return; }
+      causeTicks[0] = tick;
+      var ctx = causeCtx[0]; if (!ctx) { scheduleCauseFrame(tick, 0); return; }
       var W = causeW[0], H = causeH[0], t = causeT[0];
       causeT[0] += 0.016;
       if (causeT[0] > 12) causeT[0] = 0;
@@ -134,12 +161,13 @@
         ctx.fillText("M 9.1 GEMPA MEGATHRUST!", W * 0.28, H * 0.15);
       }
 
-      scheduleCauseFrame(tick);
+      scheduleCauseFrame(tick, 0);
     })();
 
     // ── Animasi 1: Erupsi Vulkanik ───────────────────────────────
     (function tick() {
-      var ctx = causeCtx[1]; if (!ctx) { scheduleCauseFrame(tick); return; }
+      causeTicks[1] = tick;
+      var ctx = causeCtx[1]; if (!ctx) { scheduleCauseFrame(tick, 1); return; }
       var W = causeW[1], H = causeH[1], t = causeT[1];
       causeT[1] += 0.018;
 
@@ -228,12 +256,13 @@
         ctx.fillText("Tsunami menjalar ke segala arah!", vx - 105, wSurf + 18);
       }
 
-      scheduleCauseFrame(tick);
+      scheduleCauseFrame(tick, 1);
     })();
 
     // ── Animasi 2: Longsor Bawah Laut ───────────────────────────
     (function tick() {
-      var ctx = causeCtx[2]; if (!ctx) { scheduleCauseFrame(tick); return; }
+      causeTicks[2] = tick;
+      var ctx = causeCtx[2]; if (!ctx) { scheduleCauseFrame(tick, 2); return; }
       var W = causeW[2], H = causeH[2], t = causeT[2];
       causeT[2] += 0.015;
 
@@ -328,11 +357,12 @@
         ctx.fillText("Tsunami lokal terbentuk!", W * 0.28, wTop + 18);
       }
 
-      scheduleCauseFrame(tick);
+      scheduleCauseFrame(tick, 2);
     })();
 
     (function tick() {
-      var ctx = causeCtx[3]; if (!ctx) { scheduleCauseFrame(tick); return; }
+      causeTicks[3] = tick;
+      var ctx = causeCtx[3]; if (!ctx) { scheduleCauseFrame(tick, 3); return; }
       var W = causeW[3], H = causeH[3];
       causeT[3] = (causeT[3] + 0.016) % 10;
       var phase = causeT[3];
@@ -377,7 +407,7 @@
       ctx.fillStyle = "#b6c4cf";
       ctx.font = "10px sans-serif";
       ctx.fillText(falling ? "Benda langit memasuki laut" : "Gelombang menyebar dari titik tumbukan", 10, H - 12);
-      scheduleCauseFrame(tick);
+      scheduleCauseFrame(tick, 3);
     })();
   }
 
