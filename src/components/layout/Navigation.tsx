@@ -1,0 +1,77 @@
+import { useEffect, useState } from "react";
+
+const links = [
+  ["Beranda", "#hero"],
+  ["Penyebab", "#causes"],
+  ["Simulator", "#simulator"],
+  ["Peta", "#map"],
+  ["Database", "#database"],
+  ["Riwayat", "#history"],
+  ["Mitigasi", "#mitigation"],
+] as const;
+
+export default function Navigation() {
+  const [activeSection, setActiveSection] = useState("hero");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    function updateScrollState() {
+      const sections = links
+        .map(([, href]) => document.querySelector<HTMLElement>(href))
+        .filter((section): section is HTMLElement => section !== null)
+        .sort((first, second) => first.offsetTop - second.offsetTop);
+
+      let current = "hero";
+      sections.forEach((section) => {
+        const scrollMargin = Number.parseFloat(getComputedStyle(section).scrollMarginTop) || 80;
+        if (window.scrollY >= section.offsetTop - scrollMargin - 1) current = section.id;
+      });
+
+      setActiveSection(current);
+      setShowScrollTop(window.scrollY > 300);
+    }
+
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
+
+  return (
+    <>
+      <a className="skip-link" href="#main-content">Lewati ke konten utama</a>
+      <header>
+        <nav aria-label="Navigasi utama">
+          <a className="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 20 Q7 10 14 16 Q21 22 26 10" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M2 24 Q8 14 14 20 Q20 26 26 14" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity=".5" />
+              <circle cx="14" cy="8" r="3" fill="#fb923c" />
+            </svg>
+            <span>SIMITSU</span>
+          </a>
+          <div className="nav-links">
+            {links.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                className={activeSection === href.slice(1) ? "active" : undefined}
+                aria-current={activeSection === href.slice(1) ? "location" : undefined}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      </header>
+      <button
+        id="scrollTop"
+        className={`scroll-top${showScrollTop ? " show" : ""}`}
+        type="button"
+        aria-label="Kembali ke bagian atas"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        ↑
+      </button>
+    </>
+  );
+}
