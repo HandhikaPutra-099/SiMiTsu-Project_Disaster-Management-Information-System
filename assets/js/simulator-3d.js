@@ -5,6 +5,7 @@
   var sim3dCanvas, sim3dCtx, sim3dW, sim3dH;
   var currentPhase = 0, waveH = 10, autoPlayTimer = null;
   var sim3dT = 0;
+  var reduceSimulatorMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cam3d = { theta: 0.45, phi: 0.55, dist: 1, px: 0, py: 0 };
   var drag3d = { active: false, btn: 0, lx: 0, ly: 0 };
   var pinch3d = { active: false, dist: 0 };
@@ -354,7 +355,7 @@
   function render3DLoop() {
     requestAnimationFrame(render3DLoop);
     if (!sim3dCtx) return;
-    sim3dT += 0.022;
+    if (!reduceSimulatorMotion) sim3dT += 0.022;
 
     var ctx = sim3dCtx, W = sim3dW, H = sim3dH;
     var s = simState;

@@ -1,15 +1,22 @@
 // CAUSE ANIMATIONS — fully self-contained canvas 2D animations
   // ══════════════════════════════════════════════════════════════
-  var causeT = [0, 0, 0];
-  var causeCtx = [null, null, null];
-  var causeW   = [0, 0, 0];
-  var causeH   = [0, 0, 0];
+  var causeT = [0, 0, 0, 0];
+  var causeCtx = [null, null, null, null];
+  var causeW   = [0, 0, 0, 0];
+  var causeH   = [0, 0, 0, 0];
+  var reduceCauseMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function replayCause(idx) { causeT[idx] = 0; }
+  function scheduleCauseFrame(tick) {
+    if (!reduceCauseMotion) requestAnimationFrame(tick);
+  }
+
+  function replayCause(idx) {
+    if (Number.isInteger(idx) && idx >= 0 && idx < causeT.length) causeT[idx] = 0;
+  }
 
   function initCauseAnimations() {
     // Setup each canvas once — no resize every frame
-    for (var ci = 0; ci < 3; ci++) {
+    for (var ci = 0; ci < 4; ci++) {
       (function(idx) {
         var c = document.getElementById("causeCanvas" + idx);
         if (!c) return;
@@ -27,7 +34,7 @@
 
     // ── Animasi 0: Gempa Subduksi ────────────────────────────────
     (function tick() {
-      var ctx = causeCtx[0]; if (!ctx) { requestAnimationFrame(tick); return; }
+      var ctx = causeCtx[0]; if (!ctx) { scheduleCauseFrame(tick); return; }
       var W = causeW[0], H = causeH[0], t = causeT[0];
       causeT[0] += 0.016;
       if (causeT[0] > 12) causeT[0] = 0;
@@ -127,12 +134,12 @@
         ctx.fillText("M 9.1 GEMPA MEGATHRUST!", W * 0.28, H * 0.15);
       }
 
-      requestAnimationFrame(tick);
+      scheduleCauseFrame(tick);
     })();
 
     // ── Animasi 1: Erupsi Vulkanik ───────────────────────────────
     (function tick() {
-      var ctx = causeCtx[1]; if (!ctx) { requestAnimationFrame(tick); return; }
+      var ctx = causeCtx[1]; if (!ctx) { scheduleCauseFrame(tick); return; }
       var W = causeW[1], H = causeH[1], t = causeT[1];
       causeT[1] += 0.018;
 
@@ -221,12 +228,12 @@
         ctx.fillText("Tsunami menjalar ke segala arah!", vx - 105, wSurf + 18);
       }
 
-      requestAnimationFrame(tick);
+      scheduleCauseFrame(tick);
     })();
 
     // ── Animasi 2: Longsor Bawah Laut ───────────────────────────
     (function tick() {
-      var ctx = causeCtx[2]; if (!ctx) { requestAnimationFrame(tick); return; }
+      var ctx = causeCtx[2]; if (!ctx) { scheduleCauseFrame(tick); return; }
       var W = causeW[2], H = causeH[2], t = causeT[2];
       causeT[2] += 0.015;
 
@@ -321,7 +328,56 @@
         ctx.fillText("Tsunami lokal terbentuk!", W * 0.28, wTop + 18);
       }
 
-      requestAnimationFrame(tick);
+      scheduleCauseFrame(tick);
+    })();
+
+    (function tick() {
+      var ctx = causeCtx[3]; if (!ctx) { scheduleCauseFrame(tick); return; }
+      var W = causeW[3], H = causeH[3];
+      causeT[3] = (causeT[3] + 0.016) % 10;
+      var phase = causeT[3];
+      var waterY = H * 0.52;
+      ctx.fillStyle = "#07111c";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#102a3b";
+      ctx.fillRect(0, waterY, W, H - waterY);
+      ctx.strokeStyle = "rgba(56,189,248,.65)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, waterY);
+      ctx.lineTo(W, waterY);
+      ctx.stroke();
+
+      var impactX = W * 0.58;
+      var falling = phase < 4;
+      var impactY = waterY - 5;
+      if (falling) {
+        var asteroidY = H * 0.12 + phase / 4 * (waterY - H * 0.18);
+        ctx.fillStyle = "#b9a78b";
+        ctx.beginPath();
+        ctx.arc(impactX, asteroidY, Math.max(5, Math.min(12, W * 0.035)), 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        var waveProgress = (phase - 4) / 6;
+        var ringRadius = waveProgress * W * 0.58;
+        for (var ring = 0; ring < 3; ring++) {
+          var radius = ringRadius - ring * 22;
+          if (radius <= 0) continue;
+          ctx.strokeStyle = "rgba(56,189,248," + (0.75 - ring * 0.18) + ")";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(impactX, impactY, radius, Math.max(4, radius * 0.24), 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle = "#eef4f7";
+      ctx.font = "12px sans-serif";
+      ctx.fillText("Skema tumbukan ke laut", 10, 20);
+      ctx.fillStyle = "#b6c4cf";
+      ctx.font = "10px sans-serif";
+      ctx.fillText(falling ? "Benda langit memasuki laut" : "Gelombang menyebar dari titik tumbukan", 10, H - 12);
+      scheduleCauseFrame(tick);
     })();
   }
 

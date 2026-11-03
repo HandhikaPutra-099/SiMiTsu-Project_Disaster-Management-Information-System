@@ -2,7 +2,6 @@
   // ══════════════════════════════════════════════════════════════
   window.addEventListener("load", function() {
     updateSim();
-    renderQuiz();
     initLeafletMap();
     init3DScene();
     initCauseAnimations();

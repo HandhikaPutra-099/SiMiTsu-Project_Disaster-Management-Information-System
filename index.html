@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SiMiTsu — Sistem Mitigasi Tsunami Indonesia</title>
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <!-- Three.js via CDN (r128 — last version with non-module OrbitControls) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- CSS proyek -->
@@ -17,15 +12,13 @@
   <link rel="stylesheet" href="assets/css/responsive.css" />
 
   <!-- Library eksternal: urutan load dipertahankan. -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- JavaScript proyek: data dan fungsi dimuat sesuai urutan ketergantungan. -->
   <script defer src="assets/js/data.js"></script>
   <script defer src="assets/js/history.js"></script>
+  <script defer src="assets/js/database.js"></script>
   <script defer src="assets/js/simulator-controls.js"></script>
-  <script defer src="assets/js/quiz.js"></script>
   <script defer src="assets/js/cause-animations.js"></script>
   <script defer src="assets/js/simulator-3d.js"></script>
   <script defer src="assets/js/map.js"></script>
@@ -38,22 +31,22 @@
 <!-- NAV -->
 <header>
 <nav aria-label="Navigasi utama">
-  <div class="nav-brand">
+  <a class="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
     <svg aria-hidden="true" focusable="false" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M2 20 Q7 10 14 16 Q21 22 26 10" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" fill="none"/>
       <path d="M2 24 Q8 14 14 20 Q20 26 26 14" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/>
       <circle cx="14" cy="8" r="3" fill="#f97316"/>
     </svg>
-    SiMiTsu
-  </div>
+    <span>SIMITSU</span>
+  </a>
   <div class="nav-links">
     <a href="#hero" class="active">Beranda</a>
-        <a href="#causes">Penyebab</a>
-        <a href="#simulator">Simulator 3D</a>
-        <a href="#map">Peta</a>
-        <a href="#history">Riwayat</a>
-        <a href="#mitigation">Mitigasi</a>
-        <a href="#quiz">Kuis</a>
+    <a href="#causes">Penyebab</a>
+    <a href="#simulator">Simulator</a>
+    <a href="#map">Peta</a>
+    <a href="#database">Database</a>
+    <a href="#history">Riwayat</a>
+    <a href="#mitigation">Mitigasi</a>
   </div>
 </nav>
 </header>
@@ -64,16 +57,16 @@
   <div class="home-layout">
   <div class="hero-content">
     <h1 class="hero-title">
-      Sistem Mitigasi<br/><span class="hl">Tsunami Indonesia</span>
+      Kenali Tsunami, Pahami Risikonya, Siapkan Langkah Aman.
     </h1>
     <p class="hero-sub">
-      Pahami ancaman tsunami melalui simulasi edukatif, peta, catatan historis, dan panduan mitigasi.
+      Pelajari bagaimana tsunami terjadi, telusuri kejadian yang pernah terjadi, dan pahami langkah mitigasi melalui informasi serta simulasi interaktif.
     </p>
     <div class="hero-ctas">
       <a href="#simulator" class="btn btn-primary">
-        Mulai Simulasi
+        Jelajahi Simulasi
       </a>
-      <a href="#map" class="btn btn-outline">Buka peta kejadian</a>
+      <a href="#database" class="btn btn-outline">Lihat Database Bencana</a>
     </div>
   </div>
   <div class="home-map-column">
@@ -111,98 +104,73 @@
 <!-- CAUSES -->
 <section id="causes">
   <div class="section-inner">
-    <h2 class="section-title">
-      Penyebab Tsunami
-      <span class="badge">EDUKASI</span>
-    </h2>
-    <p class="section-sub">Tsunami dapat dipicu oleh berbagai mekanisme geologi. Pahami proses setiap penyebab melalui animasi interaktif di bawah.</p>
+    <h2 class="section-title">Bagaimana tsunami terjadi</h2>
+    <p class="section-sub">Pilih ringkasan pada tiap animasi untuk melihat penjelasan singkat tentang pemindahan air laut.</p>
 
     <div class="causes-grid">
-
-      <!-- CAUSE 1: Subduksi -->
-      <div class="cause-card">
+      <article class="cause-card">
         <div class="cause-canvas-wrap">
-          <canvas id="causeCanvas0" width="680" height="200" role="img" aria-label="Animasi proses gempa subduksi memicu tsunami"></canvas>
-          <button class="play-btn" onclick="replayCause(0)">▶ Putar Ulang</button>
+          <canvas id="causeCanvas0" width="680" height="200" role="img" aria-label="Skema subduksi dan dasar laut terangkat">
+            Skema pergerakan lempeng dan perpindahan air laut.
+          </canvas>
+          <button class="play-btn" type="button" onclick="replayCause(0)">Putar ulang</button>
         </div>
         <div class="cause-body">
-          <h3 style="color:#0ea5e9">⚡ Gempa Subduksi (Megathrust)</h3>
-          <p>Lempeng samudra menunjam di bawah lempeng benua. Ketika tekanan terlepas secara tiba-tiba, dasar laut terangkat hingga beberapa meter — memindahkan kolom air yang memicu tsunami raksasa.</p>
-          <ul class="cause-steps">
-            <li>Lempeng samudra bergerak menuju lempeng benua (3–7 cm/tahun)</li>
-            <li>Tekanan menumpuk selama ratusan tahun di zona subduksi</li>
-            <li>Patahan tiba-tiba: dasar laut naik 2–10 m dalam hitungan detik</li>
-            <li>Kolom air terangkat → gelombang tsunami menyebar ke segala arah</li>
-            <li>Contoh: Aceh 2004 (M9.1), Nias 2005 (M8.6), Mentawai 2010</li>
-          </ul>
+          <h3>Gempa subduksi</h3>
+          <details class="cause-info">
+            <summary>Baca ringkasan</summary>
+            <p>Gempa dangkal di zona subduksi dapat menggeser dasar laut secara vertikal. Perubahan dasar laut memindahkan kolom air dan dapat membangkitkan tsunami.</p>
+          </details>
         </div>
-      </div>
+      </article>
 
-      <!-- CAUSE 2: Vulkanik -->
-      <div class="cause-card">
+      <article class="cause-card">
         <div class="cause-canvas-wrap">
-          <canvas id="causeCanvas1" width="680" height="200" role="img" aria-label="Animasi erupsi gunung api memicu tsunami"></canvas>
-          <button class="play-btn" onclick="replayCause(1)">▶ Putar Ulang</button>
+          <canvas id="causeCanvas1" width="680" height="200" role="img" aria-label="Skema erupsi gunung api dan gelombang di laut">
+            Skema material gunung api yang berpindah ke laut.
+          </canvas>
+          <button class="play-btn" type="button" onclick="replayCause(1)">Putar ulang</button>
         </div>
         <div class="cause-body">
-          <h3 style="color:#f97316">🌋 Erupsi Vulkanik</h3>
-          <p>Letusan gunung berapi bawah laut atau kolapsnya sisi gunung berapi pantai dapat memindahkan air laut dalam jumlah besar seketika, tanpa didahului gempa yang terasa di daratan.</p>
-          <ul class="cause-steps">
-            <li>Erupsi eksplosif / runtuhnya kubah lava ke laut</li>
-            <li>Perpindahan air masif dalam waktu sangat singkat</li>
-            <li>Tsunami menjalar dari titik erupsi ke segala arah</li>
-            <li>Biasanya lebih cepat tiba tanpa peringatan gempa awal</li>
-            <li>Contoh: Krakatau 1883 (40 m), Anak Krakatau 2018</li>
-          </ul>
+          <h3>Erupsi atau runtuhan gunung api</h3>
+          <details class="cause-info">
+            <summary>Baca ringkasan</summary>
+            <p>Letusan, runtuhnya lereng, atau material gunung api yang masuk ke laut dapat memindahkan air. Dampaknya bergantung pada proses dan kondisi setempat.</p>
+          </details>
         </div>
-      </div>
+      </article>
 
-      <!-- CAUSE 3: Longsor Bawah Laut -->
-      <div class="cause-card">
+      <article class="cause-card">
         <div class="cause-canvas-wrap">
-          <canvas id="causeCanvas2" width="680" height="200" role="img" aria-label="Animasi longsor bawah laut memicu tsunami"></canvas>
-          <button class="play-btn" onclick="replayCause(2)">▶ Putar Ulang</button>
+          <canvas id="causeCanvas2" width="680" height="200" role="img" aria-label="Skema longsoran sedimen di lereng bawah laut">
+            Skema longsoran bawah laut yang menggeser kolom air.
+          </canvas>
+          <button class="play-btn" type="button" onclick="replayCause(2)">Putar ulang</button>
         </div>
         <div class="cause-body">
-          <h3 style="color:#8b5cf6">🪨 Longsor Bawah Laut</h3>
-          <p>Longsoran sedimen bawah laut dalam skala besar (submarine landslide) dapat memindahkan jutaan ton material secara tiba-tiba, menghasilkan tsunami lokal yang sangat intens di area sekitar longsor.</p>
-          <ul class="cause-steps">
-            <li>Lereng bawah laut tidak stabil akibat gempa atau erosi</li>
-            <li>Material sedimen longsor menuruni lereng continental shelf</li>
-            <li>Perpindahan massa air menghasilkan gelombang lokal besar</li>
-            <li>Radius dampak biasanya lebih kecil tapi intensitas sangat tinggi</li>
-            <li>Contoh: Palu 2018 (sesar + likuefaksi), Papua Nugini 1998</li>
-          </ul>
+          <h3>Longsor bawah laut</h3>
+          <details class="cause-info">
+            <summary>Baca ringkasan</summary>
+            <p>Sedimen yang bergerak cepat di dasar laut dapat mendorong air di sekitarnya. Tsunami akibat longsor sering berdampak lokal, tetapi tingkat bahayanya tetap bergantung pada kondisi lokasi.</p>
+          </details>
         </div>
-      </div>
+      </article>
 
-    </div>
-
-    <!-- Proses fisika gelombang -->
-    <div style="margin-top:32px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px;">
-      <h3 style="font-size:16px; font-weight:700; margin-bottom:12px;">🌊 Fisika Perambatan Gelombang Tsunami</h3>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
-        <div style="background:var(--surface2); border-radius:10px; padding:14px;">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:4px;">Di Laut Dalam</div>
-          <div style="font-size:20px; font-weight:800; color:var(--accent);">800 km/j</div>
-          <div style="font-size:12px; color:var(--muted);">Tinggi gelombang &lt;1m, panjang gelombang &gt;200 km</div>
+      <article class="cause-card">
+        <div class="cause-canvas-wrap">
+          <canvas id="causeCanvas3" width="680" height="200" role="img" aria-label="Skema benda langit memasuki laut dan membentuk gelombang">
+            Skema tumbukan benda langit ke permukaan laut.
+          </canvas>
+          <button class="play-btn" type="button" onclick="replayCause(3)">Putar ulang</button>
         </div>
-        <div style="background:var(--surface2); border-radius:10px; padding:14px;">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:4px;">Mendekati Pantai</div>
-          <div style="font-size:20px; font-weight:800; color:var(--warn);">50–80 km/j</div>
-          <div style="font-size:12px; color:var(--muted);">Gelombang melambat, tinggi meningkat drastis (shoaling)</div>
+        <div class="cause-body">
+          <h3>Jatuhnya benda langit</h3>
+          <details class="cause-info">
+            <summary>Baca ringkasan</summary>
+            <p>Tumbukan asteroid berukuran besar ke laut dapat memindahkan air dan membangkitkan gelombang tsunami. Pemicu ini sangat jarang dibandingkan gempa bumi.</p>
+          </details>
         </div>
-        <div style="background:var(--surface2); border-radius:10px; padding:14px;">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:4px;">Amplifikasi Teluk</div>
-          <div style="font-size:20px; font-weight:800; color:var(--danger);">1.5–3×</div>
-          <div style="font-size:12px; color:var(--muted);">Teluk dan muara memperkuat tinggi gelombang hingga 3 kali</div>
-        </div>
-        <div style="background:var(--surface2); border-radius:10px; padding:14px;">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:4px;">Waktu Deteksi</div>
-          <div style="font-size:20px; font-weight:800; color:var(--ok);">15–30 mnt</div>
-          <div style="font-size:12px; color:var(--muted);">Waktu rata-rata peringatan BMKG ke pesisir Indonesia</div>
-        </div>
-      </div>
+      </article>
     </div>
   </div>
 </section>
@@ -214,10 +182,8 @@
       Simulasi Tsunami 3D
       <span class="badge">3D · INTERAKTIF</span>
     </h2>
-    <p class="section-sub">
-      Ubah parameter untuk melihat ilustrasi tahap demi tahap. Seret untuk memutar, gulir untuk memperbesar.
-    </p>
-    <p class="simulation-notice" role="note">Simulasi ini untuk edukasi. Hasilnya bukan prakiraan, peringatan, atau panduan evakuasi operasional. Ikuti informasi resmi BMKG dan BNPB saat keadaan darurat.</p>
+    <p class="section-sub">Ubah parameter untuk melihat ilustrasi tahap demi tahap.</p>
+    <p class="simulation-notice" role="note">Simulasi ini untuk edukasi, bukan prakiraan atau peringatan resmi. Untuk ancaman nyata, ikuti informasi BMKG, BNPB, dan petugas setempat.</p>
     <p class="data-status" id="simulatorStatus" role="status" aria-live="polite">Simulasi sedang dimuat.</p>
 
     <div class="sim-unified-layout">
@@ -348,13 +314,6 @@
                 <div class="r-val" id="rInland">Belum dihitung</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0;">
-                Catatan model
-              </h3>
-              <span style="font-size:10px;color:var(--muted);">bukan arahan evakuasi</span>
-            </div>
-            <ul class="steps-list" id="stepsList"><li>Hasil simulasi bergantung pada asumsi sederhana dan tidak menggantikan pemodelan resmi.</li></ul>
           </div>
         </div>
 
@@ -363,16 +322,55 @@
   </div>
 </section>
 
-<!-- MAP -->
-<section id="geography" class="editorial-section">
+<!-- DATABASE -->
+<section id="database" class="database-section">
   <div class="section-inner">
-    <h2 class="section-title">Membaca peta</h2>
-    <p class="section-sub">Gunakan lapisan peta di beranda untuk membandingkan catatan kejadian dan konteks geografis. Garis tektonik digambar sebagai ilustrasi, bukan batas resmi untuk navigasi atau keputusan evakuasi.</p>
-    <div class="geography-notes">
-      <article><h3>Samudra Hindia</h3><p>Zona subduksi Sumatra dan Jawa menjadi konteks penting untuk mempelajari kejadian tsunami di Indonesia bagian barat.</p></article>
-      <article><h3>Indonesia timur</h3><p>Maluku, Papua, dan Sulawesi berada di wilayah dengan beberapa batas lempeng. Lapisan peta membantu melihat konteks wilayah, bukan mengukur ancaman saat ini.</p></article>
-      <article><h3>Kejadian vulkanik</h3><p>Erupsi atau runtuhnya material gunung api dapat memindahkan air laut. Catatan pada peta merujuk ke katalog NOAA NCEI.</p></article>
+    <h2 class="section-title">Database Bencana</h2>
+    <p class="section-sub">Telusuri catatan tsunami Indonesia pilihan dari katalog NOAA NCEI. Arsip ini berisi kejadian historis, bukan pemantauan waktu nyata.</p>
+
+    <div class="database-filters" role="group" aria-label="Filter arsip tsunami">
+      <label for="databaseSearch">Cari nama kejadian
+        <input id="databaseSearch" type="search" placeholder="Contoh: Flores" autocomplete="off">
+      </label>
+      <label for="databaseYear">Tahun
+        <select id="databaseYear"><option value="">Semua tahun</option></select>
+      </label>
+      <label for="databaseLocation">Lokasi
+        <select id="databaseLocation"><option value="">Semua lokasi</option></select>
+      </label>
+      <label for="databaseCause">Penyebab
+        <select id="databaseCause">
+          <option value="">Semua penyebab</option>
+        </select>
+      </label>
+      <label for="databaseSort">Urutkan
+        <select id="databaseSort">
+          <option value="year-desc">Tahun terbaru</option>
+          <option value="year-asc">Tahun terlama</option>
+          <option value="name-asc">Nama A–Z</option>
+          <option value="deaths-desc">Korban meninggal terbanyak</option>
+        </select>
+      </label>
     </div>
+    <p id="databaseStatus" class="data-status" role="status" aria-live="polite">Memuat arsip kejadian.</p>
+    <div class="table-wrap database-table-wrap" tabindex="0" role="region" aria-label="Tabel database kejadian tsunami">
+      <table class="database-table">
+        <caption class="sr-only">Arsip kejadian tsunami Indonesia dari NOAA NCEI</caption>
+        <thead>
+          <tr>
+            <th scope="col">Kejadian / lokasi</th>
+            <th scope="col">Tahun</th>
+            <th scope="col">Penyebab</th>
+            <th scope="col">Magnitudo</th>
+            <th scope="col">Ketinggian maksimum tercatat</th>
+            <th scope="col">Korban meninggal</th>
+            <th scope="col">Detail</th>
+          </tr>
+        </thead>
+        <tbody id="databaseBody"></tbody>
+      </table>
+    </div>
+    <p class="database-source">Sumber data: <a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">Katalog Tsunami Historis NOAA NCEI</a>. Nilai ketinggian mengikuti catatan sumber. Data korban hilang, luka-luka, dan pengungsi tidak tersedia pada dataset pilihan ini.</p>
   </div>
 </section>
 
@@ -380,7 +378,6 @@
 <section id="history">
   <div class="section-inner">
     <h2 class="section-title">Riwayat Tsunami Indonesia</h2>
-    <p class="section-sub">Catatan dengan status valid dari katalog NOAA NCEI. Setiap baris menyediakan tautan ke sumbernya.</p>
 
     <div class="table-wrap" role="region" aria-label="Tabel riwayat tsunami, dapat digulir secara horizontal" tabindex="0">
       <p class="data-status" id="historyStatus" role="status" aria-live="polite">Data riwayat sedang dimuat.</p>
@@ -406,131 +403,78 @@
 <!-- MITIGATION -->
 <section id="mitigation">
   <div class="section-inner">
-    <h2 class="section-title">Panduan Mitigasi Tsunami</h2>
-    <p class="section-sub">Sistem zonasi & tindakan evakuasi berdasarkan standar BNPB dan UNESCO-IOC.</p>
+    <h2 class="section-title">Langkah keselamatan tsunami</h2>
+    <p class="section-sub">Kenali jalur dan tempat evakuasi yang ditetapkan untuk wilayah Anda. Ikuti petugas serta arahan resmi setempat.</p>
 
-    <div class="zone-grid" style="margin-bottom:32px;">
-      <div class="zone-card zone-red">
-        <h3 style="color:#f87171">🔴 Zona Merah — Bahaya Tinggi</h3>
-        <p style="color:#fca5a5; font-size:12px; margin-bottom:8px;">0–500m dari garis pantai / ketinggian &lt;10m dpl</p>
+    <p class="safety-message">Ketika merasakan gempa kuat atau lama di wilayah pesisir, segera menuju tempat yang lebih tinggi atau menjauh dari pantai. Jangan menunggu peringatan jika tanda alam menunjukkan potensi tsunami. Ikuti arahan petugas dan informasi resmi.</p>
+
+    <div class="mitigation-steps">
+      <article>
+        <h3>Sebelum terjadi</h3>
         <ul>
-          <li>Evakuasi SEGERA saat guncangan terasa</li>
-          <li>Tidak menunggu sirine/peringatan resmi</li>
-          <li>Jangan kembali sebelum aman dinyatakan</li>
-          <li>Rute evakuasi: menuju dataran tinggi</li>
+          <li>Kenali tanda alam, jalur evakuasi, dan tempat aman di sekitar rumah, sekolah, atau tempat kerja.</li>
+          <li>Bicarakan rencana berkumpul dan cara menghubungi keluarga.</li>
+          <li>Siapkan tas darurat berisi kebutuhan penting agar mudah dibawa saat harus mengungsi.</li>
         </ul>
-      </div>
-      <div class="zone-card zone-orange">
-        <h3 style="color:#fdba74">🟠 Zona Oranye — Bahaya Menengah</h3>
-        <p style="color:#fde68a; font-size:12px; margin-bottom:8px;">500m–2km dari pantai / ketinggian 10–30m dpl</p>
+      </article>
+      <article>
+        <h3>Saat ada ancaman</h3>
         <ul>
-          <li>Siapkan tas darurat (Go Bag)</li>
-          <li>Pantau informasi BMKG & BNPB</li>
-          <li>Kenali jalur evakuasi terdekat</li>
-          <li>Evakuasi saat level siaga 3 diumumkan</li>
+          <li>Jika gempa kuat atau lama terasa di pesisir, segera evakuasi ke tempat yang lebih tinggi atau menjauh dari pantai.</li>
+          <li>Jauhi pantai, muara, dan sungai. Gunakan jalur evakuasi setempat dan bantu orang yang membutuhkan jika aman dilakukan.</li>
+          <li>Pantau informasi BMKG dan ikuti arahan petugas. Jangan kembali untuk mengambil barang.</li>
         </ul>
-      </div>
-      <div class="zone-card zone-yellow">
-        <h3 style="color:#fef08a">🟡 Zona Kuning — Waspada</h3>
-        <p style="color:#fef9c3; font-size:12px; margin-bottom:8px;">2–5km dari pantai / ketinggian 30–50m dpl</p>
+      </article>
+      <article>
+        <h3>Setelah gelombang</h3>
         <ul>
-          <li>Tetap siaga dan ikuti informasi resmi</li>
-          <li>Jangan turun ke pantai saat peringatan</li>
-          <li>Bantu koordinasi komunitas lokal</li>
-          <li>Periksa infrastruktur evakuasi</li>
+          <li>Tetap berada di tempat aman sampai petugas menyatakan keadaan aman.</li>
+          <li>Waspadai gelombang susulan, bangunan rusak, dan kabel atau benda berbahaya.</li>
+          <li>Gunakan informasi resmi untuk mengetahui kapan dan melalui jalur mana Anda dapat kembali.</li>
         </ul>
-      </div>
-      <div class="zone-card zone-green">
-        <h3 style="color:#86efac">🟢 Zona Hijau — Relatif Aman</h3>
-        <p style="color:#bbf7d0; font-size:12px; margin-bottom:8px;">&gt;5km dari pantai / ketinggian &gt;50m dpl</p>
-        <ul>
-          <li>Area assembly point evakuasi</li>
-          <li>Dukung logistik dan pertolongan pertama</li>
-          <li>Koordinasi dengan tim SAR & BPBD</li>
-          <li>Sediakan fasilitas tempat pengungsian</li>
-        </ul>
-      </div>
+      </article>
     </div>
 
-    <h3 class="section-title" style="font-size:18px; margin-bottom:16px;">Langkah Evakuasi Mandiri</h3>
-    <div class="card-grid card-grid-2">
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">1</div>
-          <div><strong>Kenali Tanda Alam</strong><p>Guncangan kuat &gt;60 detik, air laut tiba-tiba surut drastis, suara gemuruh dari laut — itu pertanda langsung berlari.</p></div>
-        </div>
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">2</div>
-          <div><strong>Jangan Panik</strong><p>Ambil tas darurat (jika sudah siap), matikan gas & listrik, tinggalkan kendaraan jika macet — berlari lebih cepat.</p></div>
-        </div>
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">3</div>
-          <div><strong>Menuju Dataran Tinggi</strong><p>Cari ketinggian minimal 30m dpl atau jarak 3km dari pantai. Gunakan jalur evakuasi yang telah ditandai.</p></div>
-        </div>
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">4</div>
-          <div><strong>Jauhi Muara & Sungai</strong><p>Gelombang tsunami menelusuri aliran sungai jauh ke daratan. Hindari jembatan dan tepi sungai saat evakuasi.</p></div>
-        </div>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">5</div>
-          <div><strong>Bertahan di Tempat Aman</strong><p>Setelah tiba di titik aman, tunggu minimal 3 jam atau sampai BMKG menyatakan ancaman berakhir.</p></div>
-        </div>
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">6</div>
-          <div><strong>Komunikasi & Informasi</strong><p>Hubungi keluarga. Pantau radio/BMKG. Jangan percaya informasi tidak resmi. Nomordarurat: BNPB 117.</p></div>
-        </div>
-        <div class="card" style="display:flex; gap:14px; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">7</div>
-          <div><strong>Kembali & Pemulihan</strong><p>Kembali hanya dengan izin resmi. Waspada bangunan rusak, kontaminasi air, dan sisa gelombang susulan.</p></div>
-        </div>
-        <div class="card" style="background:var(--surface2);">
-          <strong style="color:var(--warn);">📦 Isi Tas Darurat (Go Bag)</strong>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
-            <span class="tag tag-blue">Air 3L</span>
-            <span class="tag tag-blue">Makanan darurat</span>
-            <span class="tag tag-blue">P3K</span>
-            <span class="tag tag-blue">Senter + baterai</span>
-            <span class="tag tag-blue">Dokumen penting</span>
-            <span class="tag tag-blue">Uang tunai</span>
-            <span class="tag tag-blue">Peluit darurat</span>
-            <span class="tag tag-blue">Selimut termal</span>
-            <span class="tag tag-red">Obat rutin</span>
-            <span class="tag tag-red">Radio portable</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- QUIZ -->
-<section id="quiz">
-  <div class="section-inner">
-    <h2 class="section-title">Uji Kesiapsiagaan</h2>
-    <p class="section-sub">Tes pengetahuan Anda tentang mitigasi tsunami. Jawab semua pertanyaan untuk melihat skor.</p>
-
-    <div class="quiz-wrap">
-      <div id="quizContainer"><p class="data-status">Memuat soal kuis.</p></div>
-      <div id="quizScore" aria-live="polite" aria-atomic="true">
-        <div class="score-val" id="scoreVal">0/10</div>
-        <p id="scoreMsg">Evaluasi skor Anda</p>
-        <button class="btn btn-primary" style="margin-top:16px;" onclick="resetQuiz()">Coba Lagi</button>
-      </div>
-    </div>
+    <p class="mitigation-source">Rute, titik aman, dan arahan evakuasi mengikuti kondisi setempat. Cari panduan dari <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a>, <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a>, BPBD, dan petugas di wilayah Anda.</p>
   </div>
 </section>
 </main>
 
 <!-- FOOTER -->
-<footer>
-  <p>© SiMiTsu. Sumber riwayat: <a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">Katalog Tsunami Historis NOAA NCEI</a>.</p>
-  <p style="margin-top:6px;">Untuk kedaruratan hubungi <strong style="color:var(--accent)">BNPB: 117</strong> &nbsp;·&nbsp; <strong style="color:var(--accent)">BMKG: (021) 6546318</strong></p>
-  <p style="margin-top:10px; border-top:1px solid var(--border); padding-top:10px; font-size:11px; color:var(--muted);">Made with IBM Bob</p>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <section class="footer-about" aria-labelledby="footer-about-title">
+      <h2 id="footer-about-title">Tentang SIMITSU</h2>
+      <p>SIMITSU membantu masyarakat mempelajari tsunami melalui penjelasan, catatan historis, peta, dan simulasi edukatif. Informasi di situs ini bukan pemantauan atau peringatan waktu nyata.</p>
+    </section>
+    <section aria-labelledby="footer-sources-title">
+      <h2 id="footer-sources-title">Sumber informasi</h2>
+      <ul>
+        <li><a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a></li>
+        <li><a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a></li>
+        <li><a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">Katalog tsunami NOAA NCEI</a></li>
+      </ul>
+    </section>
+    <section aria-labelledby="footer-contacts-title">
+      <h2 id="footer-contacts-title">Kontak resmi</h2>
+      <ul>
+        <li>BMKG Contact Center: <a href="tel:196">196</a></li>
+        <li>Kantor Graha BNPB: <a href="tel:+622129827793">(021) 2982 7793</a></li>
+      </ul>
+      <p class="footer-contact-note">Nomor kantor BNPB bukan nomor layanan darurat. Untuk arahan kedaruratan, ikuti informasi resmi dan petugas setempat.</p>
+    </section>
+  </div>
+  <p class="footer-credit">© SIMITSU. Data historis ditautkan ke sumber masing-masing.</p>
 </footer>
 
 <button class="scroll-top" id="scrollTop" aria-label="Kembali ke atas" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<noscript><p class="noscript-message">Aktifkan JavaScript untuk menggunakan peta, simulator, animasi, dan kuis.</p></noscript>
+<dialog id="databaseDialog" class="database-dialog" aria-labelledby="databaseDialogTitle">
+  <div class="database-dialog-head">
+    <h2 id="databaseDialogTitle">Detail kejadian</h2>
+    <button class="database-dialog-close" type="button" aria-label="Tutup detail kejadian" onclick="document.getElementById('databaseDialog').close()">Tutup</button>
+  </div>
+  <div id="databaseDialogBody"></div>
+</dialog>
+<noscript><p class="noscript-message">Aktifkan JavaScript untuk menggunakan peta, simulator, arsip interaktif, dan animasi.</p></noscript>
 </body>
 </html>

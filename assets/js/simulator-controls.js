@@ -74,30 +74,6 @@
       if (baseH >= 7 && !autoPlayTimer) setPhase(0);
     }
 
-    // The scenario model is not suitable for generating real-world evacuation advice.
-    var coastNotes = {
-      open: "Pantai terbuka dipilih sebagai kondisi ilustrasi.",
-      bay: "Teluk atau muara dipilih sebagai kondisi ilustrasi.",
-      cliff: "Tebing pantai dipilih sebagai kondisi ilustrasi.",
-      mangrove: "Pantai bermangrove dipilih sebagai kondisi ilustrasi."
-    };
-    var list = document.getElementById("stepsList");
-    list.replaceChildren();
-    [
-      "Angka yang ditampilkan berasal dari rumus sederhana dan bukan prakiraan tsunami.",
-      "Model ini tidak menggantikan pemodelan resmi atau memperhitungkan seluruh kondisi setempat.",
-      coastNotes[coast] || "Kondisi pantai ilustratif.",
-      "Saat merasakan gempa kuat atau lama di dekat pantai, segera menjauh ke tempat aman dan ikuti informasi BMKG serta BNPB."
-    ].forEach(function(note, index) {
-      var item = document.createElement("li");
-      var number = document.createElement("div");
-      var text = document.createElement("span");
-      number.className = "step-num";
-      number.textContent = String(index + 1);
-      text.textContent = note;
-      item.append(number, text);
-      list.appendChild(item);
-    });
   }
 
   // ══════════════════════════════════════════════════════════════

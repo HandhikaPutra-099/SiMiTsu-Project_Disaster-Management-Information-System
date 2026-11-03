@@ -19,9 +19,9 @@
     const values = [
       ev.year,
       ev.name,
-      ev.mag === "-" ? "Tidak tersedia" : `M${ev.mag}`,
-      Number.isFinite(ev.height) ? `${ev.height} m` : "Tidak tercatat",
-      ev.victims.toLocaleString("id-ID"),
+      Number.isFinite(ev.mag) ? `M${ev.mag}` : "Tidak tersedia",
+      Number.isFinite(ev.height) ? `${ev.height} m` : "Tidak tersedia",
+      Number.isFinite(ev.deaths) ? ev.deaths.toLocaleString("id-ID") : "Tidak tersedia",
       ev.cause,
     ];
 
@@ -49,10 +49,10 @@
     tbody.appendChild(row);
   });
 
-  status.textContent = `${sorted.length} catatan valid dari katalog NOAA NCEI. Angka korban adalah total korban meninggal pada catatan kejadian.`;
+  status.textContent = `${sorted.length} catatan pilihan dari katalog NOAA NCEI. Angka korban merujuk pada korban meninggal yang tercatat.`;
 
   function getMagClass(magnitude) {
-    if (magnitude === "-") return "mag-low";
+    if (!Number.isFinite(magnitude)) return "mag-low";
     if (magnitude >= 8.5) return "mag-extreme";
     if (magnitude >= 7.8) return "mag-high";
     if (magnitude >= 7.0) return "mag-med";

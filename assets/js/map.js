@@ -3,7 +3,7 @@
 
 
   function dotColor(mag) {
-    return mag==="-"||mag>=8.0 ? "#ef4444" : mag>=7.0 ? "#f97316" : "#f59e0b";
+    return !Number.isFinite(mag)||mag>=8.0 ? "#ef4444" : mag>=7.0 ? "#f97316" : "#f59e0b";
   }
 
   // ── Plate label helper (DivIcon) ───────────────────────────
@@ -104,9 +104,9 @@
         weight:1.5, opacity:1, fillOpacity:0.88
       }).bindPopup(
         "<strong>" + ev.name + " (" + ev.year + ")</strong>" +
-        "<br>Magnitudo: " + (ev.mag==="-"?"Vulkanik":"M"+ev.mag) +
+        "<br>Magnitudo: " + (Number.isFinite(ev.mag)?"M"+ev.mag:"Tidak tersedia") +
         "<br>Ketinggian maksimum: " + (Number.isFinite(ev.height) ? ev.height + " m" : "Tidak tercatat") +
-        "<br>Korban meninggal: " + ev.victims.toLocaleString("id-ID") +
+        "<br>Korban meninggal: " + (Number.isFinite(ev.deaths) ? ev.deaths.toLocaleString("id-ID") : "Tidak tersedia") +
         "<br>Penyebab: " + ev.cause
       );
       marker.on("add", function() {
