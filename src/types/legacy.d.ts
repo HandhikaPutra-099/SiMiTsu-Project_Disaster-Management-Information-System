@@ -7,14 +7,10 @@ declare global {
     L: typeof Leaflet;
     __simitsuMapReady?: boolean;
     setMapFilter?: (filter: "all" | "plates" | "tsunami" | "sensor") => void;
+    setMapCriteria?: (query: string, year: string, cause: string) => void;
     updateSim?: () => void;
     initLeafletMap?: () => void;
-    init3DScene?: () => void;
     initCauseAnimations?: () => void;
-    setPhase?: (phase: number) => void;
-    autoPlay3D?: () => void;
-    pauseAutoPlay3D?: () => void;
-    resetPhase?: () => void;
     replayCause?: (index: number) => void;
     pauseCause?: (index: number) => void;
     __simitsuLegacyPromise?: Promise<void>;

@@ -24,13 +24,13 @@ Let the map and simulator occupy the visual area their tasks need. Keep explanat
 
 ## Motion and motif
 
-Retain the existing wave mark as the product motif. Use motion only to explain tsunami processes or respond to direct user control. Respect reduced-motion preferences and avoid ambient decorative animation.
+Retain the existing wave mark as the product motif. Use restrained wave movement in the hero to show the ocean surface, and animate simulator stages only while the visitor plays them. Pause scenes when they leave view, keep camera movement under direct control, and respect reduced-motion preferences.
 
 ## Dials
 
-ENERGY 2 / RHYTHM 3 / MOTION 1
+ENERGY 2 / RHYTHM 3 / MOTION 2
 
-Reading this as: a tsunami education homepage for the Indonesian public, in a scientific geospatial interface, dial ENERGY 2 / RHYTHM 3 / MOTION 1.
+Reading this as: a tsunami education homepage for the Indonesian public, in a scientific geospatial interface, dial ENERGY 2 / RHYTHM 3 / MOTION 2.
 
 ## Decision reasons
 
@@ -38,6 +38,6 @@ Reading this as: a tsunami education homepage for the Indonesian public, in a sc
 - Blue marks water and primary interface focus; orange marks caution and selective emphasis; risk colors remain reserved for explicitly labeled risk categories.
 - The system sans-serif keeps the static site readable without adding a remote font dependency.
 - The home composition leads with a concise introduction and routes visitors to the dedicated map and mitigation sections; this keeps the first screen focused while preserving fast access to the primary tools.
-- The hero cross-section uses the established blue and orange palette to explain seafloor uplift and wave direction, with a visible caption identifying it as conceptual rather than operational.
+- The hero's generated 3D water surface gives the page spatial depth without external image assets; a dark scrim keeps the headline readable, and a static diagram remains available when WebGL is unavailable.
 - Editorial sections use headings, paragraphs, and lists so maps, records, and explanations do not all become interchangeable cards.
-- Low-motion presentation keeps attention on the data; existing simulations and animations remain available for intentional interaction.
+- Low-frequency hero waves establish the ocean environment, while simulator movement follows explicit play controls and stops when hidden or when reduced motion is requested.

@@ -154,11 +154,11 @@
       ctx.fillText("Laut dalam", 6, waterTop - 6);
       if (seaRise > 3) {
         ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px sans-serif";
-        ctx.fillText("⚡ DASAR LAUT NAIK " + Math.round(seaRise) + "m!", W * 0.22, waterTop + 18);
+        ctx.fillText("DASAR LAUT BERUBAH", W * 0.22, waterTop + 18);
       }
       if (quaking) {
         ctx.fillStyle = "#f59e0b"; ctx.font = "bold 11px sans-serif";
-        ctx.fillText("M 9.1 GEMPA MEGATHRUST!", W * 0.28, H * 0.15);
+        ctx.fillText("GEMPA BAWAH LAUT", W * 0.28, H * 0.15);
       }
 
       scheduleCauseFrame(tick, 0);

@@ -3,7 +3,8 @@
 
 
   function dotColor(mag) {
-    return !Number.isFinite(mag)||mag>=8.0 ? "#ef4444" : mag>=7.0 ? "#f97316" : "#f59e0b";
+    if (!Number.isFinite(mag)) return "#e2e8f0";
+    return mag >= 8.0 ? "#ef4444" : mag >= 7.0 ? "#f97316" : "#f59e0b";
   }
 
   // ── Plate label helper (DivIcon) ───────────────────────────
@@ -17,8 +18,43 @@
 
   // Global layer references for filter toggling
   var mapLayerGroups = { plates: null, tsunami: null, sensor: null };
+  var historicalMarkers = [];
   var leafletMapRef  = null;
   var activeFilter   = 'all';
+  var mapCriteria = { query: '', year: '', cause: '' };
+
+  function setMapCriteria(query, year, cause) {
+    mapCriteria = {
+      query: (query || '').trim().toLocaleLowerCase('id'),
+      year: year || '',
+      cause: cause || ''
+    };
+
+    var layer = mapLayerGroups.tsunami;
+    if (!layer) return;
+
+    layer.clearLayers();
+    var visibleCount = 0;
+    historicalMarkers.forEach(function(record) {
+      var matchesQuery = !mapCriteria.query ||
+        record.event.name.toLocaleLowerCase('id').indexOf(mapCriteria.query) !== -1;
+      var matchesYear = !mapCriteria.year || String(record.event.year) === mapCriteria.year;
+      var matchesCause = !mapCriteria.cause || record.event.cause === mapCriteria.cause;
+      if (matchesQuery && matchesYear && matchesCause) {
+        layer.addLayer(record.marker);
+        visibleCount += 1;
+      }
+    });
+
+    var emptyState = document.getElementById('mapEmptyState');
+    var resultStatus = document.getElementById('mapRecordsStatus');
+    if (emptyState) emptyState.hidden = visibleCount > 0;
+    if (resultStatus) {
+      resultStatus.textContent = visibleCount
+        ? visibleCount + ' catatan historis cocok dengan filter.'
+        : 'Tidak ada catatan historis yang cocok. Ubah pencarian atau filter.';
+    }
+  }
 
   // ── Layer filter function ──────────────────────────────────
   function setMapFilter(filter) {
@@ -51,14 +87,6 @@
       li.style.display = (filter === 'all' || filter === layer) ? '' : 'none';
     });
 
-    var emptyState = document.getElementById("mapEmptyState");
-    if (emptyState) {
-      var hasLayerData = filter === "all" ||
-        (filter === "plates" && mapLayerGroups.plates && mapLayerGroups.plates.getLayers().length > 0) ||
-        (filter === "tsunami" && mapLayerGroups.tsunami && mapLayerGroups.tsunami.getLayers().length > 0) ||
-        (filter === "sensor" && mapLayerGroups.sensor && mapLayerGroups.sensor.getLayers().length > 0);
-      emptyState.hidden = Boolean(hasLayerData);
-    }
   }
 
   function initLeafletMap() {
@@ -79,6 +107,7 @@
     }
     var map = L.map("leafletMap", {center:[-2.5,118], zoom:5, zoomControl:true});
     leafletMapRef = map;
+    map.createPane("historicalEventsPane").style.zIndex = "625";
 
     var baseLayer = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -109,6 +138,7 @@
       var color = dotColor(ev.mag);
       var r = ev.mag>=8.5?14:ev.mag>=7.8?11:ev.mag>=7.0?9:7;
       var marker = L.circleMarker([ev.lat, ev.lng], {
+        pane:"historicalEventsPane",
         radius:r, fillColor:color, color:"#fff",
         weight:1.5, opacity:1, fillOpacity:0.88
       }).bindPopup(
@@ -131,10 +161,11 @@
           }
         };
       });
-      tsunamiLayer.addLayer(marker);
+      historicalMarkers.push({ event: ev, marker: marker });
     });
     mapLayerGroups.tsunami = tsunamiLayer;
     tsunamiLayer.addTo(map);
+    setMapCriteria(mapCriteria.query, mapCriteria.year, mapCriteria.cause);
 
     // ══════════════════════════════════════════════════════════
     // LAYER 2 — LEMPENG TEKTONIK

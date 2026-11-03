@@ -57,9 +57,9 @@ export default function Navigation() {
         <nav aria-label="Navigasi utama">
           <a className="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
             <svg aria-hidden="true" focusable="false" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 20 Q7 10 14 16 Q21 22 26 10" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" />
-              <path d="M2 24 Q8 14 14 20 Q20 26 26 14" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity=".5" />
-              <circle cx="14" cy="8" r="3" fill="#fb923c" />
+              <path d="M2 20 Q7 10 14 16 Q21 22 26 10" stroke="#27c6dc" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M2 24 Q8 14 14 20 Q20 26 26 14" stroke="#27c6dc" strokeWidth="1.5" strokeLinecap="round" opacity=".5" />
+              <circle cx="14" cy="8" r="3" fill="#f97316" />
             </svg>
             <span>SIMITSU</span>
           </a>

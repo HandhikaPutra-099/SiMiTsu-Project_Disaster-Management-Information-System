@@ -1,11 +1,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --ocean-950: #0a0e1a;
-      --ocean-900: #111827;
-      --ocean-800: #1a2234;
-      --ocean-line: #1e293b;
-      --water: #0ea5e9;
+      --ocean-950: #071827;
+      --ocean-900: #0c3553;
+      --ocean-800: #123f5b;
+      --ocean-line: #385a70;
+      --water: #27c6dc;
       --caution: #f97316;
       --risk-high: #ef4444;
       --risk-moderate: #f59e0b;
@@ -14,8 +14,8 @@
       --surface: var(--ocean-900);
       --surface2: var(--ocean-800);
       --border: var(--ocean-line);
-      --text: #e2e8f0;
-      --muted: #a8b4c6;
+      --text: #f1f7fa;
+      --muted: #bfd2dc;
       --accent: var(--water);
       --accent2: var(--caution);
       --danger: var(--risk-high);
@@ -283,7 +283,8 @@
       width: 44px !important; height: 44px !important;
       line-height: 44px !important; font-size: 24px !important;
     }
-    .leaflet-control-attribution a { display: inline-flex; min-height: 44px; align-items: center; }
+    .leaflet-control-attribution { pointer-events: none; }
+    .leaflet-control-attribution a { display: inline-flex; min-height: 44px; align-items: center; pointer-events: auto; }
 
     .map-legend {
       display: flex; gap: 16px; flex-wrap: wrap;

@@ -293,6 +293,29 @@ main > section {
   font-size: 13px;
 }
 
+.hero-motion-control {
+  position: absolute;
+  right: clamp(18px, 5vw, 72px);
+  bottom: 24px;
+  z-index: 2;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #9ab5c4;
+  border-radius: 5px;
+  background: rgba(7, 24, 39, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.hero-motion-control:hover {
+  background: #0c3553;
+}
+
+.hero-motion-control:active {
+  background: #123f5b;
+}
+
 .btn {
   border-radius: 6px;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
@@ -1112,5 +1135,409 @@ main > section {
 @media (prefers-reduced-motion: reduce) {
   .btn {
     transition: none;
+  }
+}
+
+:root {
+  --border: #54758a;
+  --muted: #bfd2dc;
+  --text: #f1f7fa;
+  --accent: #27c6dc;
+  --accent-soft: #83e7ef;
+}
+
+.site-header nav {
+  background: rgba(12, 35, 53, 0.86);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+#hero {
+  position: relative;
+  display: grid;
+  min-height: min(760px, 94svh);
+  padding: 0;
+  isolation: isolate;
+  overflow: hidden;
+  background: #071827;
+}
+
+.hero-ocean {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(90deg, #071827 8%, rgba(7, 24, 39, 0.92) 36%, rgba(7, 24, 39, 0.36) 100%);
+}
+
+.hero-ocean::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(0deg, rgba(7, 24, 39, 0.78), transparent 34%, rgba(7, 24, 39, 0.2));
+  pointer-events: none;
+}
+
+.static-ocean,
+.ocean-scene-fallback {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-ocean > .ocean-scene {
+  position: absolute;
+  inset: 0;
+}
+
+.ocean-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  overflow: hidden;
+}
+
+.ocean-scene canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.home-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, 1240px);
+  max-width: 1240px;
+  min-height: min(760px, 94svh);
+  grid-template-columns: minmax(0, 1.15fr) minmax(250px, 0.65fr);
+  align-content: center;
+  gap: 28px clamp(36px, 8vw, 112px);
+  padding: 112px clamp(20px, 5vw, 72px) 28px;
+}
+
+.hero-content {
+  max-width: 680px;
+}
+
+.hero-kicker {
+  color: var(--accent-soft);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hero-title {
+  max-width: 13ch;
+  font-size: clamp(42px, 6vw, 76px);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+}
+
+.hero-sub {
+  max-width: 52ch;
+  color: #e0edf2;
+  font-size: clamp(16px, 1.55vw, 19px);
+}
+
+.hero-ctas .btn-primary {
+  color: #071827;
+  background: var(--accent);
+}
+
+.hero-ctas .btn-outline {
+  border-color: #9ab5c4;
+  background: rgba(7, 24, 39, 0.58);
+}
+
+.hero-note {
+  align-self: end;
+  justify-self: end;
+  width: min(100%, 355px);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(12, 35, 53, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.hero-note p {
+  margin-bottom: 10px;
+  color: var(--accent-soft);
+  font-size: 13px;
+}
+
+.hero-note h2 {
+  margin-bottom: 14px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.hero-note span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.hero-source {
+  grid-column: 1 / -1;
+  margin: 0;
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #e0edf2;
+}
+
+.map-search-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(150px, 0.7fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.map-search-controls label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.map-search-controls input,
+.map-search-controls select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.map-records-status {
+  min-height: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.map-filter-btn:disabled {
+  opacity: 0.65;
+}
+
+.sim-canvas-frame {
+  position: relative;
+  height: clamp(360px, 42vw, 600px);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #071827;
+}
+
+.sim-canvas-frame > .ocean-scene,
+.sim-canvas-frame > .scene-loading {
+  position: absolute;
+  inset: 0 0 42px;
+}
+
+.sim-canvas-frame .ocean-scene {
+  min-height: 0;
+}
+
+.scene-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: #0c2538;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.scene-loading,
+.scene-fallback-note {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 18px;
+  color: var(--text);
+  text-align: center;
+}
+
+.scene-fallback-note {
+  position: absolute;
+  right: 12px;
+  bottom: 54px;
+  left: 12px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: #071827;
+  font-size: 13px;
+}
+
+.ocean-camera-controls {
+  position: absolute;
+  right: 12px;
+  bottom: 54px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ocean-camera-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 7px 9px;
+  border: 1px solid #9ab5c4;
+  border-radius: 5px;
+  background: rgba(7, 24, 39, 0.92);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.ocean-camera-controls button:hover {
+  background: #0c3553;
+}
+
+.ocean-camera-controls button:active {
+  background: #123f5b;
+}
+
+.phase-motion-note {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.sim-panel {
+  padding-left: 22px;
+}
+
+.alert-bar.scenario {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .home-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    min-height: 680px;
+    padding-top: 136px;
+  }
+
+  .hero-note {
+    justify-self: start;
+    width: min(100%, 450px);
+  }
+
+  .map-search-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .map-search-controls label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .sim-panel {
+    padding: 18px 0 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  #hero,
+  .home-layout {
+    min-height: 690px;
+  }
+
+  .home-layout {
+    align-content: center;
+    gap: 24px;
+    padding: 136px 18px 26px;
+  }
+
+  .hero-ocean {
+    background: linear-gradient(90deg, rgba(7, 24, 39, 0.94), rgba(7, 24, 39, 0.46));
+  }
+
+  .hero-title {
+    max-width: 11ch;
+    font-size: clamp(42px, 12vw, 58px);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+  }
+
+  .hero-note {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .hero-note h2 {
+    font-size: 17px;
+  }
+
+  .hero-source {
+    font-size: 12px;
+  }
+
+  .hero-motion-control {
+    right: 18px;
+    bottom: 14px;
+  }
+
+  .map-search-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .map-search-controls label:first-child {
+    grid-column: auto;
+  }
+
+  .sim-canvas-frame {
+    height: min(110vw, 480px);
+    min-height: 350px;
+  }
+
+  .ocean-camera-controls {
+    right: 8px;
+    bottom: 50px;
+    gap: 4px;
+  }
+
+  .ocean-camera-controls button {
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 7px;
+  }
+
+  .phase-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sim-playback .btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ocean::after {
+    background: rgba(7, 24, 39, 0.28);
   }
 }

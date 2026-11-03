@@ -1,10 +1,9 @@
 import type { TsunamiEvent } from "../data/tsunamiEvents";
 import controlsUrl from "../../assets/js/simulator-controls.js?url";
-import simulatorUrl from "../../assets/js/simulator-3d.js?url";
 import causesUrl from "../../assets/js/cause-animations.js?url";
 import mapUrl from "../../assets/js/map.js?url";
 
-const scripts = [controlsUrl, simulatorUrl, causesUrl, mapUrl];
+const scripts = [controlsUrl, causesUrl, mapUrl];
 
 function appendClassicScript(source: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -39,7 +38,6 @@ export function loadLegacyFeatures(events: TsunamiEvent[]): Promise<void> {
       if (
         !window.updateSim ||
         !window.initLeafletMap ||
-        !window.init3DScene ||
         !window.initCauseAnimations
       ) {
         throw new Error("Modul peta atau simulasi tidak menyediakan fungsi inisialisasi.");
@@ -47,8 +45,11 @@ export function loadLegacyFeatures(events: TsunamiEvent[]): Promise<void> {
 
       window.updateSim();
       window.initLeafletMap();
-      window.init3DScene();
       window.initCauseAnimations();
+      const simulatorStatus = document.getElementById("simulatorStatus");
+      if (simulatorStatus) {
+        simulatorStatus.textContent = "Parameter skenario siap. Keluaran hanya ilustrasi edukatif.";
+      }
     });
 
   window.__simitsuLegacyPromise = initialization;
