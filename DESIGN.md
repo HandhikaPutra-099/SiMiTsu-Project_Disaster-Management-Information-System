@@ -37,7 +37,10 @@ Reading this as: a tsunami education homepage for the Indonesian public, in a sc
 - The dark ocean palette preserves SiMiTsu's established identity and keeps scientific map and simulator surfaces visually coherent.
 - Blue marks water and primary interface focus; orange marks caution and selective emphasis; risk colors remain reserved for explicitly labeled risk categories.
 - The system sans-serif keeps the static site readable without adding a remote font dependency.
-- The home composition leads with a concise introduction and routes visitors to the dedicated map and mitigation sections; this keeps the first screen focused while preserving fast access to the primary tools.
-- The hero's generated 3D water surface gives the page spatial depth without external image assets; a dark scrim keeps the headline readable, and a static diagram remains available when WebGL is unavailable.
-- Editorial sections use headings, paragraphs, and lists so maps, records, and explanations do not all become interchangeable cards.
+- The home composition pairs the introduction with a coordinate plot derived from the selected NOAA NCEI event records, so the first screen shows both the learning purpose and real archive data.
+- The hero's generated 3D water surface sits behind a geographic coordinate plot to add depth without replacing data with an abstract ocean image; a static diagram remains available when WebGL is unavailable.
+- A fixed, scrollable historical ticker keeps archive scope and source visible without suggesting live monitoring or moving content away from readers.
+- Editorial education rows vary around the scientific cross-sections, while the map and archive give the data the larger viewing areas they need.
+- The map's adjacent legend and event summaries keep symbology, source limits, and historical details close to the interactive Leaflet view.
+- The footer groups navigation, official sources, and contact details around the platform's educational role instead of using a generic four-column site template.
 - Low-frequency hero waves establish the ocean environment, while simulator movement follows explicit play controls and stops when hidden or when reduced motion is requested.

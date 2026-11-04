@@ -81,9 +81,9 @@ export default function DisasterEducation() {
           </p>
         </div>
 
-        {/* Featured cause — larger, full-width treatment for most common cause */}
         <article className="cause-featured" key={causes[0].title}>
           <div className="cause-featured-visual">
+            <p className="cause-index">Mekanisme 01 / 04</p>
             <canvas
               id={`causeCanvas${causes[0].canvasIndex}`}
               width="840"
@@ -127,11 +127,11 @@ export default function DisasterEducation() {
           </div>
         </article>
 
-        {/* Remaining three causes in grid */}
-        <div className="causes-grid">
-          {causes.slice(1).map((cause) => (
-            <article className="cause-card" key={cause.title}>
+        <div className="cause-index-list" aria-label="Mekanisme tsunami lainnya">
+          {causes.slice(1).map((cause, index) => (
+            <article className="cause-card cause-row" key={cause.title}>
               <div className="cause-canvas-wrap">
+                <p className="cause-index">Mekanisme 0{index + 2} / 04</p>
                 <canvas
                   id={`causeCanvas${cause.canvasIndex}`}
                   width="680"
@@ -170,7 +170,7 @@ export default function DisasterEducation() {
                   </div>
                 )}
                 <details className="cause-info">
-                  <summary>Baca penjelasan</summary>
+                  <summary>Baca penjelasan ilmiah</summary>
                   <p>{cause.description}</p>
                   <p className="cause-example">
                     <strong>Catatan:</strong> {cause.example}

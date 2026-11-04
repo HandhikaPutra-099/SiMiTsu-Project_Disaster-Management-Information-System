@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { tsunamiEvents, type TsunamiEvent } from "../../data/tsunamiEvents";
 
 const OceanScene = lazy(() => import("../scene/OceanScene"));
+const numberFormat = new Intl.NumberFormat("id-ID");
 
 function HeroScene() {
   const [sceneRequested, setSceneRequested] = useState(false);
@@ -97,46 +99,145 @@ function StaticOcean() {
   );
 }
 
+function formatCoordinate(value: number, positive: string, negative: string) {
+  return `${Math.abs(value).toFixed(2)}° ${value >= 0 ? positive : negative}`;
+}
+
+function ArchiveVisualization() {
+  const latestEvent = tsunamiEvents.reduce((latest, event) =>
+    event.year > latest.year ? event : latest
+  );
+  const selectedEvent: TsunamiEvent = latestEvent;
+
+  return (
+    <aside className="hero-visual" aria-label="Visualisasi lokasi catatan tsunami historis Indonesia">
+      <div className="hero-visual-heading">
+        <div>
+          <p className="hero-visual-kicker">Arsip historis Indonesia</p>
+          <h2>Jejak kejadian di kepulauan</h2>
+        </div>
+        <span className="hero-visual-source">NOAA NCEI</span>
+      </div>
+
+      <div className="hero-map-canvas">
+        <HeroScene />
+        <svg
+          className="hero-coordinate-map"
+          viewBox="0 0 1000 410"
+          role="img"
+          aria-labelledby="hero-map-title hero-map-desc"
+        >
+          <title id="hero-map-title">Sebaran koordinat kejadian tsunami historis di Indonesia</title>
+          <desc id="hero-map-desc">
+            Plot koordinat geografis catatan arsip NOAA NCEI dari Sumatra hingga Papua. Titik menandai lokasi kejadian, bukan tingkat risiko.
+          </desc>
+          <g className="hero-map-grid" aria-hidden="true">
+            {[95, 105, 115, 125, 135].map((longitude) => {
+              const x = 70 + ((longitude - 95) / 46) * 860;
+              return (
+                <g key={longitude}>
+                  <line x1={x} y1="30" x2={x} y2="360" />
+                  <text x={x} y="385" textAnchor="middle">{longitude}° BT</text>
+                </g>
+              );
+            })}
+            {[5, 0, -5, -10].map((latitude) => {
+              const y = 45 + ((7 - latitude) / 19) * 310;
+              return (
+                <g key={latitude}>
+                  <line x1="70" y1={y} x2="930" y2={y} />
+                  <text x="54" y={y + 4} textAnchor="end">
+                    {Math.abs(latitude)}° {latitude >= 0 ? "LU" : "LS"}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+          <text className="hero-map-region" x="125" y="185">SUMATRA</text>
+          <text className="hero-map-region" x="390" y="300">JAWA</text>
+          <text className="hero-map-region" x="560" y="200">SULAWESI</text>
+          <text className="hero-map-region" x="830" y="150">PAPUA</text>
+          <g className="hero-map-points">
+            {tsunamiEvents.map((event) => {
+              const x = 70 + ((event.lng - 95) / 46) * 860;
+              const y = 45 + ((7 - event.lat) / 19) * 310;
+              const radius = event.mag === null ? 5 : 4 + (event.mag - 5) * 1.15;
+              return (
+                <circle
+                  key={event.id}
+                  className={event.id === latestEvent.id ? "is-latest" : undefined}
+                  cx={x}
+                  cy={y}
+                  r={Math.max(radius, 4)}
+                  aria-label={`${event.name}, ${event.year}, ${formatCoordinate(event.lat, "LU", "LS")}, ${formatCoordinate(event.lng, "BT", "BB")}`}
+                >
+                  <title>
+                    {event.name}, {event.year}, {formatCoordinate(event.lat, "LU", "LS")}, {formatCoordinate(event.lng, "BT", "BB")}
+                  </title>
+                </circle>
+              );
+            })}
+          </g>
+          <text className="hero-map-axis-label" x="500" y="405" textAnchor="middle">
+            Koordinat lokasi kejadian dalam arsip pilihan
+          </text>
+        </svg>
+      </div>
+
+      <div className="hero-visual-footer">
+        <div className="hero-event-preview">
+          <span className="hero-event-year">{selectedEvent.year}</span>
+          <div>
+            <p className="hero-event-label">Catatan terbaru dalam arsip pilihan</p>
+            <h3>{selectedEvent.name}</h3>
+            <p>
+              {selectedEvent.cause}
+              {selectedEvent.mag !== null && ` · M${numberFormat.format(selectedEvent.mag)}`}
+            </p>
+          </div>
+        </div>
+        <p className="hero-coordinate">
+          {formatCoordinate(selectedEvent.lat, "LU", "LS")}
+          <br />
+          {formatCoordinate(selectedEvent.lng, "BT", "BB")}
+        </p>
+      </div>
+      <p className="hero-visual-note">
+        Titik menunjukkan lokasi catatan historis, bukan peta risiko atau pemantauan waktu nyata.
+        {" "}
+        <a
+          href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Sumber NOAA NCEI
+        </a>
+      </p>
+    </aside>
+  );
+}
+
 export default function HomePage() {
   return (
     <section id="hero" aria-labelledby="hero-title">
-      <HeroScene />
       <div className="section-inner home-layout">
         <div className="hero-content">
           <p className="hero-kicker">Sistem Mitigasi Tsunami Indonesia</p>
           <h1 className="hero-title" id="hero-title">
-            Memahami Tsunami, Membangun Kesiapsiagaan.
+            Membaca tsunami dari laut hingga pesisir.
           </h1>
           <p className="hero-sub">
-            Kenali proses terjadinya tsunami, pelajari catatan sejarah, dan pahami langkah penyelamatan melalui informasi ilmiah yang mudah diakses.
+            Pelajari proses terbentuknya tsunami, telusuri catatan historis Indonesia, dan kenali langkah keselamatan untuk wilayah pesisir.
           </p>
           <div className="hero-ctas">
-            <a href="#map" className="btn btn-primary">Jelajahi Peta Tsunami</a>
-            <a href="#simulator" className="btn btn-outline">Mulai Simulasi</a>
+            <a href="#map" className="btn btn-primary">Telusuri peta historis</a>
+            <a href="#education" className="btn btn-outline">Pelajari proses tsunami</a>
           </div>
+          <p className="hero-scope-note">
+            Materi edukatif dan arsip pilihan. Situs ini tidak menyajikan peringatan aktif.
+          </p>
         </div>
-
-        <aside className="hero-note" aria-label="Catatan ilustrasi">
-          <p className="hero-note-label">Di bawah permukaan laut</p>
-          <h2 className="hero-note-heading">Gelombang kecil di laut dalam dapat berubah saat mendekati pantai.</h2>
-          <dl className="hero-note-data">
-            <div>
-              <dt>Kecepatan di laut dalam</dt>
-              <dd>hingga 800 km/jam</dd>
-            </div>
-            <div>
-              <dt>Ketinggian di pantai</dt>
-              <dd>dapat melebihi 30 m</dd>
-            </div>
-          </dl>
-          <span className="hero-note-disclaimer">Ilustrasi konseptual. Bukan prakiraan atau peringatan.</span>
-        </aside>
-
-        <p className="hero-source">
-          Catatan historis berasal dari katalog{" "}
-          <a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">NOAA NCEI</a>.
-          {" "}Situs ini tidak menyajikan peringatan waktu nyata.
-        </p>
+        <ArchiveVisualization />
       </div>
     </section>
   );

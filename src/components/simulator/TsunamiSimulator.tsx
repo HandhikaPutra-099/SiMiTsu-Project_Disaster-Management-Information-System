@@ -244,6 +244,13 @@ export default function TsunamiSimulator() {
                       <option value="mangrove">Hutan mangrove</option>
                     </select>
                   </div>
+                  <div className="control-group">
+                    <label className="control-label" htmlFor="timeSelect">Pencahayaan ilustrasi</label>
+                    <select id="timeSelect" defaultValue="day" onChange={() => window.updateSim?.()}>
+                      <option value="day">Siang</option>
+                      <option value="night">Malam</option>
+                    </select>
+                  </div>
                 </fieldset>
                 <p className="sim-auto-update">Angka berubah mengikuti parameter dan hanya untuk pembelajaran.</p>
               </div>

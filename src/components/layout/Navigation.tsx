@@ -56,7 +56,15 @@ export default function Navigation() {
     <>
       <a className="skip-link" href="#main-content">Lewati ke konten utama</a>
       <header className={`site-header${scrolled ? " site-header--scrolled" : ""}`}>
-        <nav aria-label="Navigasi utama">
+        <div className="announcement-bar">
+          <p>
+            <span>Ruang belajar tsunami Indonesia</span>
+            <span className="announcement-divider" aria-hidden="true">/</span>
+            Catatan sejarah, peta, dan panduan edukatif
+          </p>
+          <a href="#mitigation">Lihat langkah keselamatan</a>
+        </div>
+        <nav className="primary-nav" aria-label="Navigasi utama">
           <a className="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
             <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 22 Q8 11 16 18 Q24 25 30 12" stroke="#27c6dc" strokeWidth="2.8" strokeLinecap="round" />
@@ -97,6 +105,13 @@ export default function Navigation() {
               </a>
             ))}
           </div>
+          <a
+            className="nav-primary-action"
+            href="#map"
+            onClick={() => setMenuOpen(false)}
+          >
+            Buka peta historis
+          </a>
         </nav>
       </header>
 

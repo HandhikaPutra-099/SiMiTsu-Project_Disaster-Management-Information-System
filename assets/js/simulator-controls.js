@@ -34,23 +34,27 @@
     var waveSpeedKmh = Math.round(waveSpeedMs * 3.6);
     var eta    = Math.round(dist / Math.max(waveSpeedKmh, 1) * 60);
     var inland = (baseH * 0.25 * cFact).toFixed(1);
-    simState.mag = mag;
-    simState.dep = dep;
-    simState.dist = dist;
-    simState.loc = loc;
-    simState.coast = coast;
-    simState.time = time;
-    simState.height = Number(height);
-    simState.eta = eta;
-    simState.speed = waveSpeedKmh;
-    simState.inland = Number(inland);
+    if (window.simState) {
+      window.simState.mag = mag;
+      window.simState.dep = dep;
+      window.simState.dist = dist;
+      window.simState.loc = loc;
+      window.simState.coast = coast;
+      window.simState.time = time;
+      window.simState.height = Number(height);
+      window.simState.eta = eta;
+      window.simState.speed = waveSpeedKmh;
+      window.simState.inland = Number(inland);
+    }
     waveH = Number(height);
 
     document.getElementById("rHeight").textContent   = height + " m";
     document.getElementById("rTime").textContent     = (eta < 5 ? "<5" : "~"+eta) + " mnt";
     document.getElementById("rSpeed").textContent    = waveSpeedKmh + " km/j";
     document.getElementById("rInland").textContent   = inland + " km";
-    setPhase(currentPhase);
+    if (typeof window.setPhase === "function") {
+      window.setPhase(window.currentPhase);
+    }
   }
 
   // ══════════════════════════════════════════════════════════════

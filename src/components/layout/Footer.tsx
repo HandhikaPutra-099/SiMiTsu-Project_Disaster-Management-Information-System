@@ -30,8 +30,8 @@ export default function Footer() {
           </p>
         </div>
 
-        <nav className="footer-nav-col" aria-label="Navigasi bagian situs">
-          <h2>Navigasi</h2>
+        <nav className="footer-nav-col" aria-label="Jelajahi bagian situs">
+          <h2>Jelajahi SiMiTsu</h2>
           <ul>
             {navLinks.map(([label, href]) => (
               <li key={href}>
@@ -41,8 +41,8 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <section className="footer-sources-col" aria-labelledby="footer-sources-title">
-          <h2 id="footer-sources-title">Sumber data</h2>
+        <section className="footer-resources-col" aria-label="Sumber data dan kontak resmi">
+          <h2>Sumber dan informasi resmi</h2>
           <ul>
             <li>
               <a href={tsunamiCatalogUrl} target="_blank" rel="noopener noreferrer">
@@ -59,19 +59,11 @@ export default function Footer() {
                 BNPB
               </a>
             </li>
-          </ul>
-        </section>
-
-        <section className="footer-contacts-col" aria-labelledby="footer-contacts-title">
-          <h2 id="footer-contacts-title">Kontak resmi</h2>
-          <ul>
             <li>
-              BMKG Contact Center:{" "}
-              <a href="tel:196">196</a>
+              BMKG Contact Center: <a href="tel:196">196</a>
             </li>
             <li>
-              Kantor Graha BNPB:{" "}
-              <a href="tel:+622129827793">(021) 2982 7793</a>
+              Kantor Graha BNPB: <a href="tel:+622129827793">(021) 2982 7793</a>
             </li>
           </ul>
           <p className="footer-contact-note">
