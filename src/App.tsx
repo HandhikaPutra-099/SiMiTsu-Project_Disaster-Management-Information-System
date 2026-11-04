@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import DisasterEducation from "./components/education/DisasterEducation";
 import HomePage from "./components/home/HomePage";
+import InfoStrip from "./components/home/InfoStrip";
 import Layout from "./components/layout/Layout";
 import InteractiveMap from "./components/map/InteractiveMap";
 import Mitigation from "./components/mitigation/Mitigation";
@@ -34,6 +35,7 @@ export default function App() {
   return (
     <Layout>
       <HomePage />
+      <InfoStrip />
       <DisasterEducation />
       <InteractiveMap />
       <TsunamiSimulator />

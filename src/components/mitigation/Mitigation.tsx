@@ -1,27 +1,63 @@
 const guidance = [
   {
+    phase: "Sebelum",
     title: "Sebelum terjadi",
+    intro: "Persiapan sebelum ancaman membuat respons lebih cepat dan tepat.",
     steps: [
-      "Kenali tanda alam, jalur evakuasi, dan tempat aman di sekitar rumah, sekolah, atau tempat kerja.",
-      "Bicarakan rencana berkumpul dan cara menghubungi keluarga.",
-      "Siapkan tas darurat berisi kebutuhan penting agar mudah dibawa saat harus mengungsi.",
+      {
+        heading: "Kenali jalur evakuasi",
+        detail: "Pelajari rute dan titik kumpul evakuasi yang ditetapkan untuk wilayah Anda, di sekitar rumah, sekolah, dan tempat kerja.",
+      },
+      {
+        heading: "Buat rencana keluarga",
+        detail: "Bicarakan rencana berkumpul dan cara menghubungi anggota keluarga jika terpisah saat ancaman.",
+      },
+      {
+        heading: "Siapkan tas darurat",
+        detail: "Tas berisi dokumen penting, obat-obatan, air minum, dan kebutuhan dasar agar mudah dibawa saat harus mengungsi.",
+      },
     ],
+    accent: "before",
   },
   {
+    phase: "Saat ancaman",
     title: "Saat ada ancaman",
+    intro: "Setiap detik berpengaruh. Tindakan cepat menyelamatkan jiwa.",
     steps: [
-      "Jika gempa kuat atau lama terasa di pesisir, segera evakuasi ke tempat yang lebih tinggi atau menjauh dari pantai.",
-      "Jauhi pantai, muara, dan sungai. Gunakan jalur evakuasi setempat dan bantu orang yang membutuhkan jika aman dilakukan.",
-      "Pantau informasi BMKG dan ikuti arahan petugas. Jangan kembali untuk mengambil barang.",
+      {
+        heading: "Gempa kuat atau lama di pesisir?",
+        detail: "Segera evakuasi ke tempat yang lebih tinggi atau menjauh dari pantai. Jangan menunggu sirene atau peringatan resmi.",
+      },
+      {
+        heading: "Jauhi pantai dan sungai",
+        detail: "Jauhi pantai, muara, dan sungai. Gunakan jalur evakuasi setempat. Bantu orang yang membutuhkan jika aman dilakukan.",
+      },
+      {
+        heading: "Ikuti arahan petugas",
+        detail: "Pantau informasi BMKG dan ikuti arahan petugas. Jangan kembali untuk mengambil barang.",
+      },
     ],
+    accent: "during",
   },
   {
+    phase: "Setelah",
     title: "Setelah gelombang",
+    intro: "Bahaya belum tentu berakhir setelah gelombang pertama.",
     steps: [
-      "Tetap berada di tempat aman sampai petugas menyatakan keadaan aman.",
-      "Waspadai gelombang susulan, bangunan rusak, dan kabel atau benda berbahaya.",
-      "Gunakan informasi resmi untuk mengetahui kapan dan melalui jalur mana Anda dapat kembali.",
+      {
+        heading: "Tunggu pernyataan aman",
+        detail: "Tetap berada di tempat aman sampai petugas menyatakan keadaan aman. Jangan kembali lebih awal.",
+      },
+      {
+        heading: "Waspadai bahaya sekunder",
+        detail: "Perhatikan kemungkinan gelombang susulan, bangunan yang rusak, dan kabel atau benda berbahaya di jalur evakuasi.",
+      },
+      {
+        heading: "Gunakan informasi resmi",
+        detail: "Pantau informasi resmi BMKG untuk mengetahui kapan dan melalui jalur mana Anda dapat kembali ke wilayah Anda.",
+      },
     ],
+    accent: "after",
   },
 ];
 
@@ -33,19 +69,31 @@ export default function Mitigation() {
         <p className="section-sub">
           Kenali jalur dan tempat evakuasi yang ditetapkan untuk wilayah Anda. Ikuti petugas serta arahan resmi setempat.
         </p>
+
         <p className="safety-message">
-          Ketika merasakan gempa kuat atau lama di wilayah pesisir, segera menuju tempat yang lebih tinggi atau menjauh dari pantai. Jangan menunggu peringatan jika tanda alam menunjukkan potensi tsunami. Ikuti arahan petugas dan informasi resmi.
+          Ketika merasakan gempa kuat atau lama di wilayah pesisir, segera menuju tempat yang lebih tinggi atau menjauh dari pantai. Jangan menunggu peringatan jika tanda alam menunjukkan potensi tsunami.
         </p>
-        <div className="mitigation-steps">
+
+        <div className="mitigation-phases">
           {guidance.map((phase) => (
-            <article key={phase.title}>
-              <h3>{phase.title}</h3>
-              <ul>
-                {phase.steps.map((step) => <li key={step}>{step}</li>)}
-              </ul>
+            <article key={phase.phase} className={`mitigation-phase mitigation-phase--${phase.accent}`}>
+              <div className="mitigation-phase-head">
+                <span className="mitigation-phase-label">{phase.phase}</span>
+                <h3>{phase.title}</h3>
+                <p className="mitigation-phase-intro">{phase.intro}</p>
+              </div>
+              <ol className="mitigation-steps-list">
+                {phase.steps.map((step) => (
+                  <li key={step.heading}>
+                    <h4>{step.heading}</h4>
+                    <p>{step.detail}</p>
+                  </li>
+                ))}
+              </ol>
             </article>
           ))}
         </div>
+
         <p className="mitigation-source">
           Rute, titik aman, dan arahan evakuasi mengikuti kondisi setempat. Cari panduan dari{" "}
           <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a>,{" "}

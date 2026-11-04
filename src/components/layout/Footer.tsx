@@ -1,35 +1,97 @@
 import { tsunamiCatalogUrl } from "../../data/tsunamiEvents";
 
+const navLinks = [
+  ["Beranda", "#hero"],
+  ["Edukasi", "#education"],
+  ["Peta Tsunami", "#map"],
+  ["Simulator", "#simulator"],
+  ["Database", "#database"],
+  ["Mitigasi", "#mitigation"],
+];
+
 export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-inner">
-        <section className="footer-about" aria-labelledby="footer-about-title">
-          <h2 id="footer-about-title">Tentang SIMITSU</h2>
-          <p>
-            SIMITSU membantu masyarakat mempelajari tsunami melalui penjelasan, catatan historis, peta, dan simulasi edukatif. Informasi di situs ini bukan pemantauan atau peringatan waktu nyata.
+        <div className="footer-brand-col">
+          <a className="footer-brand" href="#hero" aria-label="SIMITSU, kembali ke beranda">
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" width="28" height="28">
+              <path d="M2 22 Q8 11 16 18 Q24 25 30 12" stroke="#27c6dc" strokeWidth="2.8" strokeLinecap="round" />
+              <path d="M2 27 Q9 16 16 23 Q23 30 30 17" stroke="#27c6dc" strokeWidth="1.6" strokeLinecap="round" opacity=".45" />
+              <circle cx="16" cy="8" r="3.5" fill="#f97316" />
+            </svg>
+            <span>SIMITSU</span>
+          </a>
+          <p className="footer-desc">
+            Platform edukasi tsunami Indonesia. Membantu masyarakat mempelajari proses tsunami, menelusuri catatan historis, dan memahami langkah kesiapsiagaan melalui peta, simulasi, dan arsip ilmiah.
           </p>
-        </section>
-        <section aria-labelledby="footer-sources-title">
-          <h2 id="footer-sources-title">Sumber informasi</h2>
+          <p className="footer-disclaimer-inline">
+            Bukan sumber peringatan resmi. Informasi di situs ini bersifat edukatif.
+          </p>
+        </div>
+
+        <nav className="footer-nav-col" aria-label="Navigasi bagian situs">
+          <h2>Navigasi</h2>
           <ul>
-            <li><a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a></li>
-            <li><a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a></li>
-            <li><a href={tsunamiCatalogUrl} target="_blank" rel="noopener noreferrer">Katalog tsunami NOAA NCEI</a></li>
+            {navLinks.map(([label, href]) => (
+              <li key={href}>
+                <a href={href}>{label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <section className="footer-sources-col" aria-labelledby="footer-sources-title">
+          <h2 id="footer-sources-title">Sumber data</h2>
+          <ul>
+            <li>
+              <a href={tsunamiCatalogUrl} target="_blank" rel="noopener noreferrer">
+                Katalog tsunami NOAA NCEI
+              </a>
+            </li>
+            <li>
+              <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">
+                BMKG
+              </a>
+            </li>
+            <li>
+              <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">
+                BNPB
+              </a>
+            </li>
           </ul>
         </section>
-        <section aria-labelledby="footer-contacts-title">
+
+        <section className="footer-contacts-col" aria-labelledby="footer-contacts-title">
           <h2 id="footer-contacts-title">Kontak resmi</h2>
           <ul>
-            <li>BMKG Contact Center: <a href="tel:196">196</a></li>
-            <li>Kantor Graha BNPB: <a href="tel:+622129827793">(021) 2982 7793</a></li>
+            <li>
+              BMKG Contact Center:{" "}
+              <a href="tel:196">196</a>
+            </li>
+            <li>
+              Kantor Graha BNPB:{" "}
+              <a href="tel:+622129827793">(021) 2982 7793</a>
+            </li>
           </ul>
           <p className="footer-contact-note">
-            Nomor kantor BNPB bukan nomor layanan darurat. Untuk arahan kedaruratan, ikuti informasi resmi dan petugas setempat.
+            Nomor kantor BNPB bukan layanan darurat. Untuk kedaruratan, ikuti arahan petugas setempat.
           </p>
         </section>
       </div>
-      <p className="footer-credit">© SIMITSU. Data historis ditautkan ke sumber masing-masing.</p>
+
+      <div className="footer-bottom">
+        <p className="footer-credit">
+          &copy; SIMITSU. Data historis ditautkan ke sumber masing-masing.
+          Situs ini tidak menyajikan peringatan atau pemantauan waktu nyata.
+        </p>
+        <p className="footer-official-links">
+          Informasi resmi:{" "}
+          <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a>,{" "}
+          <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a>,{" "}
+          BPBD wilayah setempat.
+        </p>
+      </div>
     </footer>
   );
 }

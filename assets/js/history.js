@@ -1,32 +1,61 @@
-(function buildHistoryTimeline() {
-  const timeline = document.getElementById("historyTimeline");
+(function buildHistory() {
+  const tbody = document.getElementById("historyBody");
   const status = document.getElementById("historyStatus");
-  if (!timeline || !status) return;
+  if (!tbody || !status) return;
 
   if (typeof tsunamiEvents === "undefined" || !Array.isArray(tsunamiEvents)) {
-    status.textContent = "Linimasa tidak dapat dimuat. Coba muat ulang halaman.";
+    status.textContent = "Data riwayat tidak dapat dimuat. Coba muat ulang halaman atau buka katalog NOAA NCEI.";
     return;
   }
 
   if (tsunamiEvents.length === 0) {
-    status.textContent = "Belum ada catatan tsunami untuk ditampilkan.";
+    status.textContent = "Belum ada catatan tsunami terverifikasi untuk ditampilkan.";
     return;
   }
 
-  const recentEvents = [...tsunamiEvents].sort((a, b) => b.year - a.year).slice(0, 5);
-  recentEvents.forEach(function(event) {
-    const item = document.createElement("li");
-    const year = document.createElement("time");
-    const title = document.createElement("h3");
-    const cause = document.createElement("p");
+  const sorted = [...tsunamiEvents].sort((a, b) => b.year - a.year);
+  sorted.forEach(ev => {
+    const row = document.createElement("tr");
+    const values = [
+      ev.year,
+      ev.name,
+      Number.isFinite(ev.mag) ? `M${ev.mag}` : "Tidak tersedia",
+      Number.isFinite(ev.height) ? `${ev.height} m` : "Tidak tersedia",
+      Number.isFinite(ev.deaths) ? ev.deaths.toLocaleString("id-ID") : "Tidak tersedia",
+      ev.cause,
+    ];
 
-    year.dateTime = String(event.year);
-    year.textContent = String(event.year);
-    title.textContent = event.name;
-    cause.textContent = event.cause || "Penyebab tidak tersedia";
-    item.append(year, title, cause);
-    timeline.appendChild(item);
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 2) {
+        const badge = document.createElement("span");
+        badge.className = `badge-mag ${getMagClass(ev.mag)}`;
+        badge.textContent = value;
+        cell.replaceChildren(badge);
+      }
+      row.appendChild(cell);
+    });
+
+    const sourceCell = document.createElement("td");
+    const sourceLink = document.createElement("a");
+    sourceLink.href = `${tsunamiSourceUrl}${ev.sourceId}`;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noopener noreferrer";
+    sourceLink.textContent = "Sumber NOAA";
+    sourceLink.setAttribute("aria-label", `Buka catatan NOAA untuk tsunami ${ev.name}, ${ev.year}`);
+    sourceCell.appendChild(sourceLink);
+    row.appendChild(sourceCell);
+    tbody.appendChild(row);
   });
 
-  status.textContent = recentEvents.length + " catatan terbaru dari " + tsunamiEvents.length + " catatan pilihan NOAA NCEI.";
+  status.textContent = `${sorted.length} catatan pilihan dari katalog NOAA NCEI. Angka korban merujuk pada korban meninggal yang tercatat.`;
+
+  function getMagClass(magnitude) {
+    if (!Number.isFinite(magnitude)) return "mag-low";
+    if (magnitude >= 8.5) return "mag-extreme";
+    if (magnitude >= 7.8) return "mag-high";
+    if (magnitude >= 7.0) return "mag-med";
+    return "mag-low";
+  }
 })();
