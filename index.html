@@ -1,16 +1,490 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Pelajari penyebab tsunami, telusuri catatan historis, dan pahami langkah keselamatan."
-    />
-    <title>SIMITSU | Sistem Mitigasi Tsunami Indonesia</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Pelajari penyebab tsunami, telusuri data historis Indonesia, dan kenali langkah evakuasi." />
+  <title>SIMITSU | Sistem Mitigasi Tsunami Indonesia</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- CSS proyek -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/responsive.css" />
+
+  <!-- Library eksternal: urutan load dipertahankan. -->
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- JavaScript proyek: data dan fungsi dimuat sesuai urutan ketergantungan. -->
+  <script defer src="assets/js/data.js"></script>
+  <script defer src="assets/js/history.js"></script>
+  <script defer src="assets/js/database.js"></script>
+  <script defer src="assets/js/simulator-controls.js"></script>
+  <script defer src="assets/js/cause-animations.js"></script>
+  <script defer src="assets/js/simulator-3d.js"></script>
+  <script defer src="assets/js/map.js"></script>
+  <script defer src="assets/js/app.js"></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+
+<!-- NAV -->
+<header>
+<nav aria-label="Navigasi utama">
+  <a class="nav-brand" href="#hero" aria-label="SIMITSU, beranda">
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 20 Q7 10 14 16 Q21 22 26 10" stroke="var(--water)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M2 24 Q8 14 14 20 Q20 26 26 14" stroke="var(--water)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/>
+      <circle cx="14" cy="8" r="3" fill="var(--caution)"/>
+    </svg>
+    <span>SIMITSU</span>
+  </a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNavLinks">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span>Menu</span>
+  </button>
+  <div class="nav-links" id="primaryNavLinks">
+    <a href="#hero" class="active">Beranda</a>
+    <a href="#causes">Penyebab</a>
+    <a href="#simulator">Simulator</a>
+    <a href="#map">Peta</a>
+    <a href="#database">Database</a>
+    <a href="#history">Riwayat</a>
+    <a href="#mitigation">Mitigasi</a>
+    <span class="nav-indicator" aria-hidden="true"></span>
+  </div>
+</nav>
+</header>
+
+<main id="main-content">
+<!-- HERO -->
+<section id="hero">
+  <div class="home-layout">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      Gempa kuat di pesisir? Jangan tunggu sirene.
+    </h1>
+    <p class="hero-sub">
+      Menjauh dari pantai, naik ke tempat tinggi, ikuti arahan petugas.
+    </p>
+    <div class="hero-ctas">
+      <a href="#simulator" class="btn btn-primary">
+        Lihat simulasi
+      </a>
+      <a href="#database" class="btn btn-outline">Lihat Database Bencana</a>
+    </div>
+  </div>
+  <div class="home-map-column">
+    <h2 class="home-map-heading" id="home-map-heading">Catatan tsunami dan konteks tektonik</h2>
+    <p class="home-map-source">Kejadian historis dari NOAA NCEI. Garis tektonik dan titik sensor adalah ilustrasi, bukan data operasional.</p>
+    <div id="map" class="home-map" aria-labelledby="home-map-heading">
+      <div class="map-filter-bar">
+        <span class="filter-label">Lapisan</span>
+        <button class="map-filter-btn active-all" id="filterAll" aria-pressed="true" onclick="setMapFilter('all')">Semua</button>
+        <button class="map-filter-btn" id="filterPlates" aria-pressed="false" onclick="setMapFilter('plates')">Lempeng tektonik</button>
+        <button class="map-filter-btn" id="filterTsunami" aria-pressed="false" onclick="setMapFilter('tsunami')">Tsunami historis</button>
+        <button class="map-filter-btn" id="filterSensor" aria-pressed="false" onclick="setMapFilter('sensor')">Titik ilustratif</button>
+      </div>
+      <p class="data-status" id="mapStatus" role="status" aria-live="polite">Peta sedang dimuat. Titik sensor yang ditampilkan adalah ilustrasi statis.</p>
+      <p class="data-status" id="mapRecordsStatus" role="status" aria-live="polite"></p>
+      <div class="map-container">
+        <div id="leafletMap" role="region" aria-label="Peta interaktif catatan tsunami dan garis tektonik ilustratif Indonesia"></div>
+        <div class="map-legend" id="mapLegend">
+          <div class="legend-item" data-layer="tsunami"><div class="legend-dot" data-magnitude="large"></div> Tsunami besar (M≥8.0)</div>
+          <div class="legend-item" data-layer="tsunami"><div class="legend-dot" data-magnitude="medium"></div> Tsunami menengah (7.0–7.9)</div>
+          <div class="legend-item" data-layer="tsunami"><div class="legend-dot" data-magnitude="small"></div> Tsunami kecil (&lt;7.0)</div>
+          <div class="legend-item" data-layer="plates"><div class="legend-line tectonic"></div> Palung dan batas lempeng</div>
+          <div class="legend-item" data-layer="plates"><div class="legend-line fault"></div> Sesar</div>
+          <div class="legend-item" data-layer="sensor"><div class="legend-dot sensor"></div> Titik ilustrasi, bukan sensor aktual</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- CAUSES -->
+<section id="causes">
+  <div class="section-inner">
+    <h2 class="section-title">Bagaimana tsunami terjadi</h2>
+    <p class="section-sub">Pilih animasi untuk melihat mekanisme, contoh, dan tanda yang perlu dikenali.</p>
+
+    <div class="causes-grid">
+      <article class="cause-card" data-cause-card>
+        <details class="cause-info">
+          <summary class="cause-trigger" aria-controls="causeDetails0">
+            <canvas id="causeCanvas0" width="680" height="220" aria-hidden="true"></canvas>
+            <span>Gempa bawah laut</span>
+            <span class="sr-only">Buka detail</span>
+          </summary>
+          <div class="cause-popover" id="causeDetails0" role="region" aria-label="Detail gempa bawah laut">
+            <button class="cause-close" type="button">Tutup</button>
+            <dl>
+              <div><dt>Mekanisme</dt><dd>Perubahan dasar laut yang cepat dapat memindahkan kolom air.</dd></div>
+              <div><dt>Contoh kejadian</dt><dd><a href="https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/events/2214" target="_blank" rel="noopener noreferrer">Flores, 1992, tercatat NOAA NCEI sebagai gempa M7.8.</a></dd></div>
+              <div><dt>Ciri yang dikenali</dt><dd>Guncangan kuat atau lama di pesisir. Segera menuju tempat tinggi, jangan menunggu sirene.</dd></div>
+            </dl>
+          </div>
+        </details>
+      </article>
+
+      <article class="cause-card" data-cause-card>
+        <details class="cause-info">
+          <summary class="cause-trigger" aria-controls="causeDetails1">
+            <canvas id="causeCanvas1" width="680" height="220" aria-hidden="true"></canvas>
+            <span>Erupsi atau runtuhan gunung api</span>
+            <span class="sr-only">Buka detail</span>
+          </summary>
+          <div class="cause-popover" id="causeDetails1" role="region" aria-label="Detail erupsi atau runtuhan gunung api">
+            <button class="cause-close" type="button">Tutup</button>
+            <dl>
+              <div><dt>Mekanisme</dt><dd>Erupsi, runtuhan lereng, atau material yang masuk ke laut dapat memindahkan air.</dd></div>
+              <div><dt>Contoh kejadian</dt><dd><a href="https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/tsunamis/events/1142" target="_blank" rel="noopener noreferrer">Krakatau, 1883, tercatat NOAA NCEI dengan penyebab erupsi vulkanik.</a></dd></div>
+              <div><dt>Ciri yang dikenali</dt><dd>Erupsi atau runtuhan di sekitar laut perlu diikuti dengan arahan petugas setempat.</dd></div>
+            </dl>
+          </div>
+        </details>
+      </article>
+
+      <article class="cause-card" data-cause-card>
+        <details class="cause-info">
+          <summary class="cause-trigger" aria-controls="causeDetails2">
+            <canvas id="causeCanvas2" width="680" height="220" aria-hidden="true"></canvas>
+            <span>Longsor bawah laut</span>
+            <span class="sr-only">Buka detail</span>
+          </summary>
+          <div class="cause-popover" id="causeDetails2" role="region" aria-label="Detail longsor bawah laut">
+            <button class="cause-close" type="button">Tutup</button>
+            <dl>
+              <div><dt>Mekanisme</dt><dd>Longsoran besar di dasar laut dapat menggeser air di sekitarnya.</dd></div>
+              <div><dt>Contoh kejadian</dt><dd>Data pilihan di situs ini tidak mencantumkan contoh yang dikaitkan dengan longsor bawah laut.</dd></div>
+              <div><dt>Ciri yang dikenali</dt><dd>Pergerakan di bawah laut tidak selalu terlihat dari pantai. Patuhi peringatan resmi dan jauhi pesisir.</dd></div>
+            </dl>
+          </div>
+        </details>
+      </article>
+
+      <article class="cause-card" data-cause-card>
+        <details class="cause-info">
+          <summary class="cause-trigger" aria-controls="causeDetails3">
+            <canvas id="causeCanvas3" width="680" height="220" aria-hidden="true"></canvas>
+            <span>Jatuhnya benda langit</span>
+            <span class="sr-only">Buka detail</span>
+          </summary>
+          <div class="cause-popover" id="causeDetails3" role="region" aria-label="Detail jatuhnya benda langit">
+            <button class="cause-close" type="button">Tutup</button>
+            <dl>
+              <div><dt>Mekanisme</dt><dd>Tumbukan benda langit besar di laut dapat memindahkan air.</dd></div>
+              <div><dt>Contoh kejadian</dt><dd>Data pilihan di situs ini tidak mencantumkan contoh terverifikasi. Animasi hanya skema.</dd></div>
+              <div><dt>Ciri yang dikenali</dt><dd>Dari pantai, benda langit bukan petunjuk evakuasi yang dapat diandalkan. Ikuti peringatan resmi.</dd></div>
+            </dl>
+          </div>
+        </details>
+      </article>
+    </div>
+    <button class="motion-toggle" id="causeMotionToggle" type="button" aria-pressed="false">Jeda animasi</button>
+  </div>
+</section>
+
+<!-- UNIFIED SIMULATOR 3D -->
+<section id="simulator">
+  <div class="section-inner">
+    <h2 class="section-title">
+      Simulasi Tsunami 3D
+    </h2>
+    <p class="section-sub">Ubah parameter untuk melihat ilustrasi tahap demi tahap.</p>
+    <div class="sim-unified-layout">
+
+      <!-- ── LEFT: ALL CONTROLS ─────────────────────────────── -->
+      <div class="sim-panel">
+
+        <!-- A: PARAMETER GEMPA -->
+        <h3>Parameter gempa</h3>
+
+        <div class="control-group">
+        <label class="control-label" for="magSlider">Magnitudo Gempa <span class="val" id="magVal">7.5 SR</span></label>
+          <input type="range" id="magSlider" min="5.0" max="9.5" step="0.1" value="7.5" oninput="updateSim()"/>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px;">
+            <span>5.0</span><span>7.0</span><span>8.0</span><span>9.0</span><span>9.5</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="depSlider">Kedalaman Gempa <span class="val" id="depVal">30 km</span></label>
+          <input type="range" id="depSlider" min="5" max="200" step="5" value="30" oninput="updateSim()"/>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px;">
+            <span>5 km</span><span style="color:var(--ok)">Dangkal</span><span>200 km</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="distSlider">Jarak Episentrum ke Pantai <span class="val" id="distVal">80 km</span></label>
+          <input type="range" id="distSlider" min="10" max="500" step="10" value="80" oninput="updateSim()"/>
+        </div>
+
+        <hr class="sim-divider"/>
+
+        <!-- B: KONDISI LINGKUNGAN -->
+        <h3>Kondisi lingkungan</h3>
+
+        <div class="control-group">
+          <label class="control-label" for="locSelect">Lokasi / Zona Laut</label>
+          <select id="locSelect" onchange="updateSim()">
+            <option value="shallow">Perairan dangkal / Paparan benua</option>
+            <option value="trench" selected>Zona subduksi (palung laut)</option>
+            <option value="deep">Laut dalam (&gt;3000 m)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="coastSelect">Tipe Pantai</label>
+          <select id="coastSelect" onchange="updateSim()">
+            <option value="open" selected>Pantai terbuka / landai</option>
+            <option value="bay">Teluk / muara sungai (+80%)</option>
+            <option value="cliff">Tebing / pantai curam (-30%)</option>
+            <option value="mangrove">Hutan mangrove (-40%)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="timeSelect">Waktu Kejadian</label>
+          <select id="timeSelect" onchange="updateSim()">
+            <option value="day" selected>Siang hari (06–18)</option>
+            <option value="night">Malam / dini hari</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary sim-update" type="button" onclick="updateSim()">Perbarui simulasi</button>
+
+        <hr class="sim-divider"/>
+
+        <!-- C: FASE 3D -->
+        <h3>Fase simulasi</h3>
+        <ul class="phase-list" id="phaseList" aria-label="Pilih fase simulasi">
+          <li class="active"><button type="button" aria-pressed="true" onclick="setPhase(0)"><span class="ph-num">1</span>Kondisi Normal</button></li>
+          <li><button type="button" aria-pressed="false" onclick="setPhase(1)"><span class="ph-num">2</span>Gempa, dasar laut naik</button></li>
+          <li><button type="button" aria-pressed="false" onclick="setPhase(2)"><span class="ph-num">3</span>Gelombang terbentuk</button></li>
+          <li><button type="button" aria-pressed="false" onclick="setPhase(3)"><span class="ph-num">4</span>Propagasi laut dalam</button></li>
+          <li><button type="button" aria-pressed="false" onclick="setPhase(4)"><span class="ph-num">5</span>Pendangkalan dan amplifikasi</button></li>
+          <li><button type="button" aria-pressed="false" onclick="setPhase(5)"><span class="ph-num">6</span>Gelombang mencapai pantai</button></li>
+        </ul>
+
+        <div class="sim-actions">
+          <button class="btn btn-primary" id="simPlaySequence" type="button" onclick="autoPlay3D()">Putar urutan</button>
+          <button class="btn btn-outline" type="button" onclick="pauseAutoPlay3D()">Jeda urutan</button>
+          <button class="btn btn-outline" type="button" onclick="resetPhase()">Ulangi</button>
+        </div>
+        <button class="motion-toggle" id="simMotionToggle" type="button" aria-pressed="false">Jeda gerak 3D</button>
+
+        <div id="phaseDesc" role="status" aria-live="polite" style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.6;background:var(--surface2);border-radius:7px;padding:9px;">
+          Kondisi laut normal. Lihat pantai berpasir, bangunan, vegetasi, dan figur manusia.
+        </div>
+
+        <hr class="sim-divider"/>
+
+        <!-- D: KONTROL KAMERA -->
+        <h3>Kontrol kamera</h3>
+        <div class="sim3d-controls">
+          <span class="ctrl-hint">Seret untuk memutar; tombol panah saat visual dipilih juga bisa dipakai</span>
+          <span class="ctrl-hint">Tombol kanan untuk menggeser</span>
+          <span class="ctrl-hint">Roda tetikus atau cubit untuk zoom; tekan + atau − saat visual dipilih</span>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT: 3D CANVAS + DATA ────────────────────────── -->
+      <div class="sim-right-col">
+
+        <!-- 3D Canvas -->
+        <canvas id="threeCanvas" width="1200" height="700" role="group" tabindex="0" aria-label="Visualisasi interaktif tahapan gelombang tsunami. Gunakan tombol panah untuk memutar, Shift dan tombol panah untuk menggeser, plus atau minus untuk zoom, dan Home untuk mengatur ulang kamera."></canvas>
+        <p id="simulatorStatus" class="data-status" role="status" aria-live="polite" hidden></p>
+
+        <!-- Data Result Panel (driven by parameter calc) -->
+        <div class="sim-data-panel" id="simResult">
+          <div class="result-body">
+            <div class="result-grid">
+              <div class="result-item">
+                <div class="r-label">Tinggi gelombang ilustratif</div>
+                <div class="r-val" id="rHeight">Belum dihitung</div>
+              </div>
+              <div class="result-item">
+                <div class="r-label">Waktu tempuh model</div>
+                <div class="r-val" id="rTime">Belum dihitung</div>
+              </div>
+              <div class="result-item">
+                <div class="r-label">Kecepatan model</div>
+                <div class="r-val" id="rSpeed">Belum dihitung</div>
+              </div>
+              <div class="result-item">
+                <div class="r-label">Jangkauan model</div>
+                <div class="r-val" id="rInland">Belum dihitung</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATABASE -->
+<section id="database" class="database-section">
+  <div class="section-inner">
+    <h2 class="section-title">Database Bencana</h2>
+    <p class="section-sub">Telusuri catatan tsunami Indonesia pilihan dari katalog NOAA NCEI. Arsip ini berisi kejadian historis, bukan pemantauan waktu nyata.</p>
+
+    <div class="database-filters" role="group" aria-label="Filter arsip tsunami">
+      <label for="databaseSearch">Cari nama kejadian
+        <input id="databaseSearch" type="search" placeholder="Contoh: Flores" autocomplete="off">
+      </label>
+      <label for="databaseYear">Tahun
+        <select id="databaseYear"><option value="">Semua tahun</option></select>
+      </label>
+      <label for="databaseLocation">Lokasi
+        <select id="databaseLocation"><option value="">Semua lokasi</option></select>
+      </label>
+      <label for="databaseCause">Penyebab
+        <select id="databaseCause">
+          <option value="">Semua penyebab</option>
+        </select>
+      </label>
+      <label for="databaseMagnitude">Magnitudo
+        <select id="databaseMagnitude">
+          <option value="">Semua magnitudo</option>
+        </select>
+      </label>
+      <label for="databaseSort">Urutkan
+        <select id="databaseSort">
+          <option value="year-desc">Tahun terbaru</option>
+          <option value="year-asc">Tahun terlama</option>
+          <option value="name-asc">Nama A–Z</option>
+          <option value="deaths-desc">Korban meninggal terbanyak</option>
+          <option value="magnitude-desc">Magnitudo terbesar</option>
+          <option value="magnitude-asc">Magnitudo terkecil</option>
+        </select>
+      </label>
+    </div>
+    <p id="databaseStatus" class="data-status" role="status" aria-live="polite">Memuat arsip kejadian.</p>
+    <div class="table-wrap database-table-wrap" tabindex="0" role="region" aria-label="Tabel database kejadian tsunami">
+      <table class="database-table">
+        <caption class="sr-only">Arsip kejadian tsunami Indonesia dari NOAA NCEI</caption>
+        <thead>
+          <tr>
+            <th scope="col">Kejadian / lokasi</th>
+            <th scope="col">Tahun</th>
+            <th scope="col">Penyebab</th>
+            <th scope="col">Magnitudo</th>
+            <th scope="col">Ketinggian maksimum tercatat</th>
+            <th scope="col">Korban meninggal</th>
+            <th scope="col">Detail</th>
+            <th scope="col">Sumber</th>
+          </tr>
+        </thead>
+        <tbody id="databaseBody"></tbody>
+      </table>
+    </div>
+    <p class="database-source">Sumber data: <a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">Katalog Tsunami Historis NOAA NCEI</a>. Nilai ketinggian mengikuti catatan sumber. Data korban hilang, luka-luka, dan pengungsi tidak tersedia pada dataset pilihan ini.</p>
+  </div>
+</section>
+
+<!-- HISTORY SUMMARY -->
+<section id="history">
+  <div class="section-inner">
+    <div class="history-heading">
+      <div>
+        <h2 class="section-title">Riwayat, dalam linimasa</h2>
+        <p class="section-sub">Beberapa catatan terbaru. Tabel lengkap tersedia di Database.</p>
+      </div>
+      <a class="text-link" href="#database">Buka Database</a>
+    </div>
+    <p class="data-status" id="historyStatus" role="status" aria-live="polite">Linimasa sedang dimuat.</p>
+    <ol class="history-timeline" id="historyTimeline" aria-label="Linimasa kejadian tsunami"></ol>
+  </div>
+</section>
+
+<!-- MITIGATION -->
+<section id="mitigation">
+  <div class="section-inner">
+    <div class="mitigation-layout">
+      <div class="mitigation-intro">
+        <h2 class="section-title">Langkah keselamatan tsunami</h2>
+        <p>Kenali apa yang perlu dilakukan sebelum, saat, dan sesudah ancaman.</p>
+      </div>
+      <div class="mitigation-content">
+        <div class="mitigation-tabs" role="group" aria-label="Pilih fase mitigasi">
+          <button class="mitigation-tab" type="button" aria-pressed="true" aria-controls="mitigation-before" data-phase="before">Sebelum</button>
+          <button class="mitigation-tab" type="button" aria-pressed="false" aria-controls="mitigation-during" data-phase="during">Saat ancaman</button>
+          <button class="mitigation-tab" type="button" aria-pressed="false" aria-controls="mitigation-after" data-phase="after">Sesudah</button>
+        </div>
+        <div class="mitigation-panel" id="mitigation-before" data-panel="before">
+          <h3>Sebelum</h3>
+          <ul>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V5l8-2 8 2v15l-8-2-8 2Z M12 3v15 M4 5l8 2 8-2"/></svg>Kenali jalur dan titik kumpul evakuasi</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 20c0-4 2-6 6-6s6 2 6 6M15 15c3 0 5 2 5 5"/></svg>Sepakati rencana berkumpul keluarga</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8Z M9 8V5a3 3 0 0 1 6 0v3M9 13h6"/></svg>Siapkan tas darurat</li>
+          </ul>
+        </div>
+        <div class="mitigation-panel" id="mitigation-during" data-panel="during" hidden>
+          <h3>Saat ancaman</h3>
+          <ul>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 20h18L12 4 3 20Z M12 10v4M12 17h.01"/></svg>Gempa kuat atau lama? Langsung ke tempat tinggi</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 18h18M5 18l3-7 3 4 3-9 5 12M4 6h4"/></svg>Jauhi pantai, muara, dan sungai</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v14H5zM9 9l6 6M15 9l-6 6"/></svg>Jangan kembali mengambil barang</li>
+          </ul>
+        </div>
+        <div class="mitigation-panel" id="mitigation-after" data-panel="after" hidden>
+          <h3>Sesudah</h3>
+          <ul>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>Tunggu petugas menyatakan aman</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V8l8-5 8 5v12M8 20v-7h8v7M3 8l9 7 9-7"/></svg>Waspadai gelombang susulan dan bangunan rusak</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>Pantau informasi BMKG</li>
+          </ul>
+        </div>
+        <p class="mitigation-source">Rute dan titik aman berbeda tiap wilayah. Cek <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a>, <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a>, dan BPBD setempat.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#hero" aria-label="SIMITSU, kembali ke beranda">SIMITSU</a>
+      <p>Sistem Mitigasi Tsunami Indonesia</p>
+    </div>
+    <section aria-labelledby="footer-sources-title">
+      <h2 id="footer-sources-title">Sumber data</h2>
+      <ul>
+        <li><a href="https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data?country=INDONESIA" target="_blank" rel="noopener noreferrer">Katalog tsunami NOAA NCEI</a></li>
+      </ul>
+    </section>
+    <section aria-labelledby="footer-contacts-title">
+      <h2 id="footer-contacts-title">Kontak resmi</h2>
+      <ul>
+        <li>BMKG Contact Center: <a href="tel:196">196</a></li>
+        <li>Kantor Graha BNPB: <a href="tel:+622129827793">(021) 2982 7793</a></li>
+      </ul>
+    </section>
+  </div>
+  <p class="footer-disclaimer">Bukan sumber peringatan resmi. Ikuti <a href="https://www.bmkg.go.id/" target="_blank" rel="noopener noreferrer">BMKG</a>, <a href="https://www.bnpb.go.id/" target="_blank" rel="noopener noreferrer">BNPB</a>, dan BPBD.</p>
+</footer>
+
+<button class="scroll-top" id="scrollTop" type="button" aria-label="Kembali ke atas">
+  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<dialog id="databaseDialog" class="database-dialog" aria-labelledby="databaseDialogTitle">
+  <div class="database-dialog-head">
+    <h2 id="databaseDialogTitle">Detail kejadian</h2>
+    <button class="database-dialog-close" type="button" aria-label="Tutup detail kejadian" onclick="document.getElementById('databaseDialog').close()">Tutup</button>
+  </div>
+  <div id="databaseDialogBody"></div>
+</dialog>
+<noscript><p class="noscript-message">Aktifkan JavaScript untuk menggunakan peta, simulator, arsip interaktif, dan animasi.</p></noscript>
+</body>
 </html>

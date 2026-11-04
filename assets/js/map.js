@@ -1,11 +1,10 @@
-// LEAFLET MAP — Accurate tectonic plates & event coordinates
+// LEAFLET MAP — Historical records and illustrative tectonic lines
   // ══════════════════════════════════════════════════════════════
-
-
-  function dotColor(mag) {
-    if (!Number.isFinite(mag)) return "#e2e8f0";
-    return mag >= 8.0 ? "#ef4444" : mag >= 7.0 ? "#f97316" : "#f59e0b";
-  }
+var mapColors = {
+  water: getComputedStyle(document.documentElement).getPropertyValue("--water").trim() || "#65c4cd",
+  caution: getComputedStyle(document.documentElement).getPropertyValue("--caution").trim() || "#f29a58",
+  paper: getComputedStyle(document.documentElement).getPropertyValue("--paper").trim() || "#f5f1e7"
+};
 
   // ── Plate label helper (DivIcon) ───────────────────────────
   function plateLabel(layerGroup, map, lat, lng, text, color) {
@@ -13,14 +12,13 @@
       html: '<div style="background:rgba(0,0,0,0.72);color:'+color+';padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid '+color+';pointer-events:none;">'+text+'</div>',
       className: '', iconAnchor: [50, 10]
     });
-    layerGroup.addLayer(L.marker([lat, lng], {icon: icon, interactive: false}));
+    layerGroup.addLayer(L.marker([lat, lng], {icon: icon, interactive: false, keyboard: false}));
   }
 
   // Global layer references for filter toggling
   var mapLayerGroups = { plates: null, tsunami: null, sensor: null };
   var historicalMarkers = [];
   var leafletMapRef  = null;
-  var activeFilter   = 'all';
   var mapCriteria = { query: '', year: '', cause: '' };
 
   function setMapCriteria(query, year, cause) {
@@ -46,9 +44,7 @@
       }
     });
 
-    var emptyState = document.getElementById('mapEmptyState');
     var resultStatus = document.getElementById('mapRecordsStatus');
-    if (emptyState) emptyState.hidden = visibleCount > 0;
     if (resultStatus) {
       resultStatus.textContent = visibleCount
         ? visibleCount + ' catatan historis cocok dengan filter.'
@@ -58,7 +54,6 @@
 
   // ── Layer filter function ──────────────────────────────────
   function setMapFilter(filter) {
-    activeFilter = filter;
     var map = leafletMapRef;
     if (!map) return;
 
@@ -86,6 +81,15 @@
       var layer = li.getAttribute('data-layer');
       li.style.display = (filter === 'all' || filter === layer) ? '' : 'none';
     });
+
+    var status = document.getElementById("mapRecordsStatus");
+    if (filter === "plates" && status) {
+      status.textContent = "Garis tektonik pada peta bersifat ilustratif.";
+    } else if (filter === "sensor" && status) {
+      status.textContent = "Titik yang ditampilkan bukan lokasi sensor aktual.";
+    } else if (filter === "all" || filter === "tsunami") {
+      setMapCriteria(mapCriteria.query, mapCriteria.year, mapCriteria.cause);
+    }
 
   }
 
@@ -135,11 +139,11 @@
     // ══════════════════════════════════════════════════════════
     var tsunamiLayer = L.layerGroup();
     tsunamiEvents.forEach(function(ev) {
-      var color = dotColor(ev.mag);
+      var color = mapColors.water;
       var r = ev.mag>=8.5?14:ev.mag>=7.8?11:ev.mag>=7.0?9:7;
       var marker = L.circleMarker([ev.lat, ev.lng], {
         pane:"historicalEventsPane",
-        radius:r, fillColor:color, color:"#fff",
+        radius:r, fillColor:color, color:mapColors.paper,
         weight:1.5, opacity:1, fillOpacity:0.88
       }).bindPopup(
         "<strong>" + ev.name + " (" + ev.year + ")</strong>" +
@@ -183,49 +187,49 @@
       [-6.5,103.5],[-7.5,105.0],[-8.5,106.5],[-9.0,108.5],[-9.5,110.5],
       [-9.8,112.5],[-9.8,114.5],[-9.5,116.5],[-9.8,118.5],[-10.0,120.5],
       [-10.2,122.0],[-10.0,124.0]
-    ], {color:"#ff6b00",weight:4,opacity:0.95,dashArray:"12,5"},
+    ], {color:mapColors.water,weight:4,opacity:0.95,dashArray:"12,5"},
        "Garis ilustratif: Palung Sunda (Java Trench)");
-    plateLabel(platesLayer, map, -9.0, 109.5, "PALUNG SUNDA", "#ff6b00");
+    plateLabel(platesLayer, map, -9.0, 109.5, "PALUNG SUNDA", mapColors.water);
 
     // 2. Banda Arc
     addPlate([
       [-9.5,124.0],[-9.2,125.5],[-8.8,127.0],[-8.0,128.5],
       [-7.0,130.0],[-5.5,131.5],[-4.5,132.5],[-3.5,133.5],
       [-2.5,134.5],[-1.5,135.5],[-0.5,136.5],[0.5,137.5]
-    ], {color:"#ff6b00",weight:3,opacity:0.9,dashArray:"8,5"},
+    ], {color:mapColors.water,weight:3,opacity:0.9,dashArray:"8,5"},
        "Garis ilustratif: Busur Banda");
-    plateLabel(platesLayer, map, -4.0, 131.5, "BUSUR BANDA", "#ff6b00");
+    plateLabel(platesLayer, map, -4.0, 131.5, "BUSUR BANDA", mapColors.water);
 
     // 3. Philippine Plate
     addPlate([
       [10.0,127.5],[8.0,127.0],[6.0,126.0],[4.0,125.5],
       [2.0,125.5],[0.5,126.0],[-1.0,126.5],[-2.0,127.0],
       [-3.0,127.5],[-4.0,128.0]
-    ], {color:"#8b5cf6",weight:3,opacity:0.9,dashArray:"6,4"},
+    ], {color:mapColors.water,weight:3,opacity:0.9,dashArray:"6,4"},
        "Garis ilustratif: batas Lempeng Filipina");
-    plateLabel(platesLayer, map, 3.0, 126.2, "LEMPENG FILIPINA", "#8b5cf6");
+    plateLabel(platesLayer, map, 3.0, 126.2, "LEMPENG FILIPINA", mapColors.water);
 
     // 4. North Sulawesi Trench
     addPlate([
       [4.5,124.0],[3.5,124.5],[2.5,125.0],[1.5,125.5],
       [0.5,126.5],[-0.5,127.0],[-1.5,127.5],[-2.0,128.5]
-    ], {color:"#8b5cf6",weight:2.5,opacity:0.9,dashArray:"6,4"},
+    ], {color:mapColors.water,weight:2.5,opacity:0.9,dashArray:"6,4"},
        "Garis ilustratif: Palung Sulawesi Utara");
-    plateLabel(platesLayer, map, 2.5, 124.8, "PALUNG SULAWESI", "#8b5cf6");
+    plateLabel(platesLayer, map, 2.5, 124.8, "PALUNG SULAWESI", mapColors.water);
 
     // 5. Australian Plate (PNG)
     addPlate([
       [-4.5,141.0],[-5.0,143.0],[-5.5,145.0],[-6.0,147.0],
       [-6.5,149.5],[-7.0,152.0],[-7.5,155.0]
-    ], {color:"#22c55e",weight:3,opacity:0.9,dashArray:"8,4"},
+    ], {color:mapColors.water,weight:3,opacity:0.9,dashArray:"8,4"},
        "Garis ilustratif: batas Lempeng Australia dengan Papua Nugini");
-    plateLabel(platesLayer, map, -6.0, 145.5, "LEMPENG AUSTRALIA", "#22c55e");
+    plateLabel(platesLayer, map, -6.0, 145.5, "LEMPENG AUSTRALIA", mapColors.water);
 
     // 6. Australia–Eurasia south of Timor
     addPlate([
       [-10.5,124.0],[-11.0,126.0],[-11.5,128.0],[-12.0,130.0],
       [-12.5,132.0],[-13.0,134.0],[-13.0,136.0],[-12.5,138.0]
-    ], {color:"#22c55e",weight:2.5,opacity:0.85,dashArray:"6,4"},
+    ], {color:mapColors.water,weight:2.5,opacity:0.85,dashArray:"6,4"},
        "Garis ilustratif: batas Lempeng Australia di selatan Timor");
 
     // 7. Sumatera Fault
@@ -233,37 +237,37 @@
       [5.5,95.5],[4.5,96.0],[3.5,96.5],[2.5,97.0],[1.5,97.5],
       [0.5,98.0],[-0.5,98.5],[-1.5,99.0],[-2.5,99.5],[-3.5,100.0],
       [-4.5,101.0],[-5.5,102.0],[-5.8,103.5]
-    ], {color:"#f59e0b",weight:2.5,opacity:0.85,dashArray:"4,4"},
+    ], {color:mapColors.caution,weight:2.5,opacity:0.85,dashArray:"4,4"},
        "Garis ilustratif: Sesar Besar Sumatera");
-    plateLabel(platesLayer, map, 1.0, 97.8, "SESAR SUMATERA", "#f59e0b");
+    plateLabel(platesLayer, map, 1.0, 97.8, "SESAR SUMATERA", mapColors.caution);
 
     // 8. Palu-Koro
     addPlate([
       [1.5,120.0],[1.0,120.2],[0.5,120.0],[0.0,119.9],
       [-0.5,119.8],[-1.0,119.8],[-1.5,120.2],[-2.0,120.5]
-    ], {color:"#f59e0b",weight:2.5,opacity:0.9,dashArray:"4,3"},
+    ], {color:mapColors.caution,weight:2.5,opacity:0.9,dashArray:"4,3"},
        "Garis ilustratif: Sesar Palu-Koro");
-    plateLabel(platesLayer, map, 0.0, 120.5, "SESAR PALU-KORO", "#f59e0b");
+    plateLabel(platesLayer, map, 0.0, 120.5, "SESAR PALU-KORO", mapColors.caution);
 
     // 9. Sorong Fault
     addPlate([
       [-1.0,131.0],[-0.5,132.5],[0.0,134.0],[0.5,135.5],
       [0.8,137.0],[1.0,138.5],[1.0,140.5]
-    ], {color:"#f59e0b",weight:2,opacity:0.8,dashArray:"4,4"},
+    ], {color:mapColors.caution,weight:2,opacity:0.8,dashArray:"4,4"},
        "Garis ilustratif: Sesar Sorong");
-    plateLabel(platesLayer, map, 0.5, 135.5, "SESAR SORONG", "#f59e0b");
+    plateLabel(platesLayer, map, 0.5, 135.5, "SESAR SORONG", mapColors.caution);
 
     // 10. Flores Back-Arc Thrust
     addPlate([
       [-7.5,117.0],[-8.0,119.0],[-8.2,121.0],
       [-8.0,123.0],[-7.5,124.5]
-    ], {color:"#60a5fa",weight:2,opacity:0.8,dashArray:"5,3"},
+    ], {color:mapColors.caution,weight:2,opacity:0.8,dashArray:"5,3"},
        "Garis ilustratif: Sesar Flores");
-    plateLabel(platesLayer, map, -8.0, 120.5, "SESAR FLORES", "#60a5fa");
+    plateLabel(platesLayer, map, -8.0, 120.5, "SESAR FLORES", mapColors.caution);
 
     // Plate name labels
-    plateLabel(platesLayer, map, 5.0, 105.0, "LEMPENG EURASIA", "#93c5fd");
-    plateLabel(platesLayer, map, -14.0, 120.0, "LEMPENG AUSTRALIA", "#86efac");
+    plateLabel(platesLayer, map, 5.0, 105.0, "LEMPENG EURASIA", mapColors.water);
+    plateLabel(platesLayer, map, -14.0, 120.0, "LEMPENG AUSTRALIA", mapColors.water);
 
     mapLayerGroups.plates = platesLayer;
     platesLayer.addTo(map);
@@ -288,13 +292,13 @@
     ];
 
     sensors.forEach(function(s, index) {
-      var color = "#0ea5e9";
+      var color = mapColors.water;
       var r = 7;
       var icon = L.divIcon({
         html: '<div style="position:relative;width:'+(r*2+6)+'px;height:'+(r*2+6)+'px;">' +
               '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
               'width:'+(r*2)+'px;height:'+(r*2)+'px;border-radius:50%;background:'+color+';' +
-              'border:2px solid #fff;z-index:2;"></div>' +
+              'border:2px solid '+mapColors.paper+';z-index:2;"></div>' +
               '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
               'width:'+(r*2+6)+'px;height:'+(r*2+6)+'px;border-radius:50%;background:'+color+';' +
               'opacity:0.3;"></div>' +
@@ -302,7 +306,7 @@
         className: '', iconAnchor: [r+3, r+3]
       });
       sensorLayer.addLayer(
-        L.marker([s.lat, s.lng], {icon: icon})
+        L.marker([s.lat, s.lng], {icon: icon, title: "Titik ilustrasi " + (index + 1)})
           .bindPopup(
             '<strong style="color:'+color+'">Titik ilustrasi '+(index+1)+'</strong>' +
             '<br>Posisi ini bukan lokasi sensor aktual dan tidak menampilkan data operasional.'

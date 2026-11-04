@@ -5,15 +5,24 @@
   var causeW   = [0, 0, 0, 0];
   var causeH   = [0, 0, 0, 0];
   var causePaused = [true, true, true, true];
+  var causeVisible = [false, false, false, false];
   var causeTicks = [];
+  var causeMotionPaused = false;
+  var causePalette = {
+    water: getComputedStyle(document.documentElement).getPropertyValue("--water").trim() || "#65c4cd",
+    caution: getComputedStyle(document.documentElement).getPropertyValue("--caution").trim() || "#f29a58",
+    muted: getComputedStyle(document.documentElement).getPropertyValue("--muted").trim() || "#c1ced1"
+  };
   var causeMotionPreference = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
   var reduceCauseMotion = Boolean(causeMotionPreference && causeMotionPreference.matches);
 
   function updateCauseMotionPreference(event) {
     reduceCauseMotion = event.matches;
-    if (reduceCauseMotion) {
-      for (var index = 0; index < causePaused.length; index++) causePaused[index] = true;
+    for (var index = 0; index < causePaused.length; index++) {
+      if (reduceCauseMotion || causeMotionPaused || !causeVisible[index]) pauseCause(index);
+      else replayCause(index);
     }
+    updateCauseMotionControl();
   }
 
   if (causeMotionPreference) {
@@ -40,7 +49,102 @@
     if (Number.isInteger(idx) && idx >= 0 && idx < causePaused.length) causePaused[idx] = true;
   }
 
+  function updateCauseMotionControl() {
+    var control = document.getElementById("causeMotionToggle");
+    if (!control) return;
+    control.disabled = reduceCauseMotion;
+    control.setAttribute("aria-pressed", String(causeMotionPaused || reduceCauseMotion));
+    control.textContent = reduceCauseMotion
+      ? "Animasi dijeda oleh pengaturan perangkat"
+      : causeMotionPaused ? "Putar animasi" : "Jeda animasi";
+  }
+
+  function setCauseMotionPaused(paused) {
+    causeMotionPaused = paused;
+    for (var index = 0; index < causePaused.length; index++) {
+      if (paused || reduceCauseMotion || !causeVisible[index]) pauseCause(index);
+      else replayCause(index);
+    }
+    updateCauseMotionControl();
+  }
+
+  function setCauseDetails(details, open, openedBy) {
+    var summary = details.querySelector("summary");
+    details.open = open;
+    details.dataset.openedBy = open ? openedBy : "";
+    summary.setAttribute("aria-expanded", String(open));
+  }
+
+  function initCauseDetails() {
+    var cards = Array.from(document.querySelectorAll("[data-cause-card]"));
+    cards.forEach(function(card) {
+      var details = card.querySelector("details");
+      var summary = details.querySelector("summary");
+      var close = details.querySelector(".cause-close");
+      summary.setAttribute("aria-expanded", "false");
+
+      summary.addEventListener("click", function(event) {
+        event.preventDefault();
+        if (details.open && details.dataset.openedBy === "hover") {
+          details.dataset.openedBy = "user";
+        } else {
+          setCauseDetails(details, !details.open, "user");
+        }
+      });
+
+      card.addEventListener("pointerenter", function(event) {
+        if (event.pointerType === "mouse" && !details.open) {
+          setCauseDetails(details, true, "hover");
+        }
+      });
+
+      card.addEventListener("pointerleave", function() {
+        if (details.dataset.openedBy === "hover" && !details.contains(document.activeElement)) {
+          setCauseDetails(details, false);
+        }
+      });
+
+      close.addEventListener("click", function() {
+        setCauseDetails(details, false);
+        summary.focus();
+      });
+    });
+
+    document.addEventListener("click", function(event) {
+      cards.forEach(function(card) {
+        var details = card.querySelector("details");
+        if (details.open && !card.contains(event.target)) {
+          var summary = details.querySelector("summary");
+          var focusIsInside = details.contains(document.activeElement);
+          setCauseDetails(details, false);
+          if (focusIsInside) summary.focus();
+        }
+      });
+    });
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key !== "Escape") return;
+      cards.forEach(function(card) {
+        var details = card.querySelector("details");
+        if (!details.open) return;
+        var summary = details.querySelector("summary");
+        var focusIsInside = details.contains(document.activeElement);
+        setCauseDetails(details, false);
+        if (focusIsInside) summary.focus();
+      });
+    });
+  }
+
   function initCauseAnimations() {
+    var motionToggle = document.getElementById("causeMotionToggle");
+    if (motionToggle) {
+      motionToggle.addEventListener("click", function() {
+        setCauseMotionPaused(!causeMotionPaused);
+      });
+    }
+    updateCauseMotionControl();
+    initCauseDetails();
+
     // Setup each canvas once — no resize every frame
     for (var ci = 0; ci < 4; ci++) {
       (function(idx) {
@@ -109,7 +213,7 @@
       ctx.lineTo(W, H); ctx.lineTo(W * 0.5, H); ctx.closePath(); ctx.fill();
       // Fault line flash
       if (quaking && Math.sin(phase * 20) > 0.3) {
-        ctx.strokeStyle = "rgba(255,200,50,0.9)"; ctx.lineWidth = 2;
+        ctx.strokeStyle = causePalette.caution; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(W*0.5, H*0.62 - seaRise); ctx.lineTo(W*0.5, H); ctx.stroke();
       }
       ctx.restore();
@@ -117,13 +221,13 @@
       // --- Water layer ---
       var waterTop = H * 0.34 - seaRise * 0.75;
       var waterGrad = ctx.createLinearGradient(0, waterTop, 0, H * 0.55);
-      waterGrad.addColorStop(0, "rgba(4,100,160,0.9)"); waterGrad.addColorStop(1, "rgba(2,40,80,0.95)");
+      waterGrad.addColorStop(0, "#102b3a"); waterGrad.addColorStop(1, "#071a25");
       ctx.fillStyle = waterGrad; ctx.fillRect(0, 0, W, waterTop);
 
       // --- Tsunami wave on water surface ---
       if (waveSpd > 0) {
         var wAmp = Math.min(waveSpd * 28, 28);
-        ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 2.5;
+        ctx.strokeStyle = causePalette.water; ctx.lineWidth = 2.5;
         ctx.beginPath();
         for (var xi = 0; xi <= W; xi += 2) {
           var envelope = Math.exp(-Math.pow((xi / W) - 0.5, 2) * 5) * wAmp;
@@ -132,7 +236,8 @@
         }
         ctx.stroke();
         // Fill under wave
-        ctx.fillStyle = "rgba(56,189,248,0.15)";
+        ctx.fillStyle = causePalette.water;
+        ctx.globalAlpha = 0.15;
         ctx.beginPath();
         for (var xi2 = 0; xi2 <= W; xi2 += 2) {
           var env2 = Math.exp(-Math.pow((xi2 / W) - 0.5, 2) * 5) * wAmp;
@@ -140,24 +245,26 @@
           xi2 === 0 ? ctx.moveTo(xi2, wy2) : ctx.lineTo(xi2, wy2);
         }
         ctx.lineTo(W, waterTop); ctx.lineTo(0, waterTop); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
       }
 
       // Water surface shimmer line
-      ctx.strokeStyle = "rgba(14,165,233,0.5)"; ctx.lineWidth = 1;
+      ctx.strokeStyle = causePalette.water; ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, waterTop); ctx.lineTo(W, waterTop); ctx.stroke();
+      ctx.globalAlpha = 1;
 
       // --- Labels ---
-      ctx.font = "bold 11px sans-serif"; ctx.fillStyle = "#94a3b8";
+      ctx.font = "bold 11px sans-serif"; ctx.fillStyle = causePalette.muted;
       ctx.fillText("← Lempeng Samudra", 8, H * 0.72 + qShake * 0.3);
       ctx.fillText("Lempeng Benua →", W * 0.55, H * 0.55 - seaRise * 0.4);
-      ctx.fillStyle = "rgba(14,165,233,0.7)"; ctx.font = "10px sans-serif";
+      ctx.fillStyle = causePalette.water; ctx.font = "10px sans-serif";
       ctx.fillText("Laut dalam", 6, waterTop - 6);
       if (seaRise > 3) {
-        ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px sans-serif";
+        ctx.fillStyle = causePalette.caution; ctx.font = "bold 12px sans-serif";
         ctx.fillText("DASAR LAUT BERUBAH", W * 0.22, waterTop + 18);
       }
       if (quaking) {
-        ctx.fillStyle = "#f59e0b"; ctx.font = "bold 11px sans-serif";
+        ctx.fillStyle = causePalette.caution; ctx.font = "bold 11px sans-serif";
         ctx.fillText("GEMPA BAWAH LAUT", W * 0.28, H * 0.15);
       }
 
@@ -198,18 +305,16 @@
       ctx.moveTo(vx - 90, vy0); ctx.lineTo(vx - 20, vy0 - 80); ctx.lineTo(vx + 20, vy0 - 80); ctx.lineTo(vx + 90, vy0);
       ctx.closePath(); ctx.fill();
 
-      // Lava glow inside crater
+      // Eruption center and displaced water
       if (erupting) {
-        var glowR = ctx.createRadialGradient(vx, vy0 - 80, 2, vx, vy0 - 80, 30 + erupt * 0.4);
-        glowR.addColorStop(0, "rgba(255,180,30,0.9)"); glowR.addColorStop(0.5, "rgba(239,68,68,0.5)"); glowR.addColorStop(1, "rgba(239,68,68,0)");
-        ctx.fillStyle = glowR;
-        ctx.beginPath(); ctx.arc(vx, vy0 - 80, 30 + erupt * 0.4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = causePalette.caution;
+        ctx.beginPath(); ctx.ellipse(vx, vy0 - 80, 18, 5, 0, 0, Math.PI * 2); ctx.fill();
 
         // Eruption column
-        var colGrad = ctx.createLinearGradient(vx, vy0 - 80 - erupt, vx, vy0 - 80);
-        colGrad.addColorStop(0, "rgba(200,80,20,0)"); colGrad.addColorStop(0.4, "rgba(239,68,68,0.8)"); colGrad.addColorStop(1, "rgba(255,160,30,0.95)");
-        ctx.fillStyle = colGrad;
+        ctx.fillStyle = causePalette.caution;
+        ctx.globalAlpha = 0.75;
         ctx.beginPath(); ctx.ellipse(vx, vy0 - 80 - erupt * 0.5, 14 + erupt * 0.25, erupt * 0.6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
 
         // Debris particles
         for (var dp = 0; dp < 10; dp++) {
@@ -217,15 +322,16 @@
           var rad  = 15 + erupt * 0.7 * ((dp % 3) / 3 + 0.3);
           var px2  = vx + Math.cos(ang2) * rad * 0.5;
           var py2  = vy0 - 82 - erupt * 0.4 - Math.abs(Math.sin(ang2)) * rad * 0.7;
-          ctx.fillStyle = dp % 2 === 0 ? "#f97316" : "#fbbf24";
+          ctx.fillStyle = causePalette.caution;
           ctx.beginPath(); ctx.arc(px2, py2, 2.5, 0, Math.PI * 2); ctx.fill();
         }
       }
 
       // Water surface
       var wSurf = H * 0.62;
-      ctx.strokeStyle = "rgba(14,165,233,0.5)"; ctx.lineWidth = 1;
+      ctx.strokeStyle = causePalette.water; ctx.globalAlpha = 0.6; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, wSurf); ctx.lineTo(W, wSurf); ctx.stroke();
+      ctx.globalAlpha = 1;
 
       // Propagating circular waves
       if (waveProp > 0) {
@@ -233,27 +339,29 @@
           var ringR = (waveProp * 1.6 * W * 0.5 - ring * 55) % (W * 0.6);
           if (ringR > 0) {
             var alpha = Math.max(0, 0.8 - ring * 0.25) * waveProp;
-            ctx.strokeStyle = "rgba(56,189,248," + alpha + ")";
+            ctx.strokeStyle = causePalette.water;
+            ctx.globalAlpha = alpha;
             ctx.lineWidth = 2 - ring * 0.4;
             ctx.beginPath();
             ctx.ellipse(vx, wSurf, ringR, ringR * 0.25, 0, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.globalAlpha = 1;
           }
         }
       }
 
       // Labels
-      ctx.fillStyle = "rgba(14,165,233,0.7)"; ctx.font = "10px sans-serif";
+      ctx.fillStyle = causePalette.water; ctx.font = "10px sans-serif";
       ctx.fillText("Permukaan laut", 6, wSurf - 5);
-      ctx.fillStyle = "#94a3b8"; ctx.font = "11px sans-serif";
+      ctx.fillStyle = causePalette.muted; ctx.font = "11px sans-serif";
       ctx.fillText("Gunung Berapi Bawah Laut", vx - 72, H * 0.94);
       if (erupting) {
-        ctx.fillStyle = "#ef4444"; ctx.font = "bold 12px sans-serif";
-        ctx.fillText("🌋 ERUPSI EKSPLOSIF!", vx - 68, H * 0.12);
+        ctx.fillStyle = causePalette.caution; ctx.font = "bold 12px sans-serif";
+        ctx.fillText("ERUPSI VULKANIK", vx - 55, H * 0.12);
       }
       if (waveProp > 0.3) {
-        ctx.fillStyle = "#0ea5e9"; ctx.font = "bold 11px sans-serif";
-        ctx.fillText("Tsunami menjalar ke segala arah!", vx - 105, wSurf + 18);
+        ctx.fillStyle = causePalette.water; ctx.font = "bold 11px sans-serif";
+        ctx.fillText("Gelombang menyebar", vx - 64, wSurf + 18);
       }
 
       scheduleCauseFrame(tick, 1);
@@ -300,8 +408,8 @@
       if (startX + sX < W * 0.52 + 30) {
         var slideAlpha = Math.min(0.5 + slideAmt / 100, 0.92);
         var slidGrad = ctx.createLinearGradient(startX + sX, H * 0.44, startX + sX, H * 0.44 + 45 + sY);
-        slidGrad.addColorStop(0, "rgba(139,92,246," + slideAlpha + ")");
-        slidGrad.addColorStop(1, "rgba(100,60,180," + (slideAlpha * 0.6) + ")");
+        slidGrad.addColorStop(0, "rgba(242,154,88," + slideAlpha + ")");
+        slidGrad.addColorStop(1, "rgba(103,67,43," + (slideAlpha * 0.8) + ")");
         ctx.fillStyle = slidGrad;
         ctx.beginPath();
         ctx.moveTo(startX + sX,       H * 0.44 - 4);
@@ -312,7 +420,7 @@
         // Sediment dust trail
         if (sliding) {
           var dustGrad = ctx.createLinearGradient(startX, H * 0.44, startX + sX, H * 0.44 + sY);
-          dustGrad.addColorStop(0, "rgba(139,92,246,0)"); dustGrad.addColorStop(1, "rgba(139,92,246,0.25)");
+          dustGrad.addColorStop(0, "rgba(242,154,88,0)"); dustGrad.addColorStop(1, "rgba(242,154,88,0.18)");
           ctx.fillStyle = dustGrad;
           ctx.fillRect(startX - 10, H * 0.44, sX + 10, sY + 10);
         }
@@ -330,30 +438,33 @@
         for (var wr = 0; wr < 3; wr++) {
           var wRad = (waveAmt * W * 0.55 - wr * 60) % (W * 0.58);
           if (wRad > 5) {
-            ctx.strokeStyle = "rgba(56,189,248," + Math.max(0, 0.85 - wr * 0.25) + ")";
+            ctx.strokeStyle = causePalette.water;
+            ctx.globalAlpha = Math.max(0, 0.85 - wr * 0.25);
             ctx.lineWidth = 2.5 - wr * 0.5;
             ctx.beginPath();
             ctx.ellipse(wCX, wTop, wRad, wRad * 0.3, 0, Math.PI, Math.PI * 2);
             ctx.stroke();
+            ctx.globalAlpha = 1;
           }
         }
       }
 
-      ctx.strokeStyle = "rgba(14,165,233,0.5)"; ctx.lineWidth = 1;
+      ctx.strokeStyle = causePalette.water; ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, wTop); ctx.lineTo(W, wTop); ctx.stroke();
+      ctx.globalAlpha = 1;
 
       // Labels
-      ctx.fillStyle = "#94a3b8"; ctx.font = "11px sans-serif";
+      ctx.fillStyle = causePalette.muted; ctx.font = "11px sans-serif";
       ctx.fillText("Continental Shelf", W * 0.58, H * 0.42);
       ctx.fillText("Lereng Bawah Laut", 8, H * 0.72);
-      ctx.fillStyle = "rgba(14,165,233,0.7)"; ctx.font = "10px sans-serif";
+      ctx.fillStyle = causePalette.water; ctx.font = "10px sans-serif";
       ctx.fillText("Permukaan laut", 6, wTop - 5);
       if (slideAmt > 10) {
-        ctx.fillStyle = "#8b5cf6"; ctx.font = "bold 12px sans-serif";
+        ctx.fillStyle = causePalette.caution; ctx.font = "bold 12px sans-serif";
         ctx.fillText("⬇ LONGSOR " + Math.round(slideAmt) + "m!", W * 0.28, H * 0.5 + sY * 0.3);
       }
       if (waveAmt > 0.2) {
-        ctx.fillStyle = "#0ea5e9"; ctx.font = "bold 11px sans-serif";
+        ctx.fillStyle = causePalette.water; ctx.font = "bold 11px sans-serif";
         ctx.fillText("Tsunami lokal terbentuk!", W * 0.28, wTop + 18);
       }
 
@@ -371,12 +482,14 @@
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#102a3b";
       ctx.fillRect(0, waterY, W, H - waterY);
-      ctx.strokeStyle = "rgba(56,189,248,.65)";
+      ctx.strokeStyle = causePalette.water;
+      ctx.globalAlpha = 0.65;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, waterY);
       ctx.lineTo(W, waterY);
       ctx.stroke();
+      ctx.globalAlpha = 1;
 
       var impactX = W * 0.58;
       var falling = phase < 4;
@@ -393,15 +506,17 @@
         for (var ring = 0; ring < 3; ring++) {
           var radius = ringRadius - ring * 22;
           if (radius <= 0) continue;
-          ctx.strokeStyle = "rgba(56,189,248," + (0.75 - ring * 0.18) + ")";
+          ctx.strokeStyle = causePalette.water;
+          ctx.globalAlpha = 0.75 - ring * 0.18;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.ellipse(impactX, impactY, radius, Math.max(4, radius * 0.24), 0, Math.PI, Math.PI * 2);
           ctx.stroke();
+          ctx.globalAlpha = 1;
         }
       }
 
-      ctx.fillStyle = "#eef4f7";
+      ctx.fillStyle = causePalette.muted;
       ctx.font = "12px sans-serif";
       ctx.fillText("Skema tumbukan ke laut", 10, 20);
       ctx.fillStyle = "#b6c4cf";
@@ -409,6 +524,26 @@
       ctx.fillText(falling ? "Benda langit memasuki laut" : "Gelombang menyebar dari titik tumbukan", 10, H - 12);
       scheduleCauseFrame(tick, 3);
     })();
+
+    var cards = document.querySelectorAll("[data-cause-card]");
+    if ("IntersectionObserver" in window) {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          var index = Array.prototype.indexOf.call(cards, entry.target);
+          causeVisible[index] = entry.isIntersecting;
+          if (entry.isIntersecting && !causeMotionPaused && !reduceCauseMotion) replayCause(index);
+          else pauseCause(index);
+        });
+      }, { threshold: 0.1 });
+      cards.forEach(function(card) { observer.observe(card); });
+    } else {
+      causeVisible = [true, true, true, true];
+      if (!causeMotionPaused && !reduceCauseMotion) {
+        causeVisible.forEach(function(visible, index) {
+          if (visible) replayCause(index);
+        });
+      }
+    }
   }
 
   // ══════════════════════════════════════════════════════════════

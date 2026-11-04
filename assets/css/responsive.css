@@ -1,479 +1,412 @@
-/* ── RESPONSIVE LAYOUT: TABLET & MOBILE ── */
-    @media (max-width: 960px) {
-      .home-layout {
-        max-width: 760px;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 30px;
-      }
-
-      .hero-content { max-width: 700px; }
-      .home-map #leafletMap { height: 420px; }
-      .geography-notes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-      .sim-panel {
-        position: static;
-        top: auto;
-        max-height: none;
-        overflow: visible;
-      }
-
-      #threeCanvas {
-        height: min(58vw, 480px);
-        min-height: 320px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      /* Navigation becomes a two-row bar with swipeable menu links. */
-      nav {
-        display: block;
-        height: auto;
-        min-height: 82px;
-        padding: 6px 12px 7px;
-      }
-
-      .nav-brand {
-        height: 29px;
-        gap: 7px;
-        font-size: 15px;
-      }
-
-      .nav-brand svg {
-        width: 23px;
-        height: 23px;
-      }
-
-      .nav-links {
-        display: flex;
-        width: 100%;
-        gap: 4px;
-        margin-top: 4px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding-bottom: 2px;
-      }
-
-      .nav-links::-webkit-scrollbar { display: none; }
-
-      .nav-links a {
-        flex: 0 0 auto;
-        padding: 6px 9px;
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        font-size: 11px;
-      }
-
-      section {
-        padding-top: 104px;
-      }
-
-      section[id] {
-        scroll-margin-top: 104px;
-      }
-
-      .section-inner {
-        padding: 20px 14px 36px;
-      }
-
-      .section-title {
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 7px;
-        font-size: 19px;
-        line-height: 1.35;
-      }
-
-      .section-sub {
-        margin-bottom: 18px;
-        font-size: 12px;
-      }
-
-      /* Home / hero section */
-      #hero {
-        min-height: auto;
-        padding: 104px 14px 30px;
-      }
-
-      .home-layout {
-        width: 100%;
-        gap: 26px;
-      }
-
-      .hero-content {
-        width: 100%;
-        padding: 0;
-      }
-
-      .hero-title {
-        font-size: clamp(32px, 8vw, 40px);
-        line-height: 1.12;
-        margin-bottom: 12px;
-      }
-
-      .hero-sub {
-        font-size: 14px;
-        margin-bottom: 20px;
-      }
-
-      .hero-ctas {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 9px;
-      }
-
-      .hero-ctas .btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .home-map-heading { font-size: 16px; }
-      .home-map-source { font-size: 12px; }
-      .home-map { scroll-margin-top: 104px; }
-      .home-map #leafletMap {
-        height: min(96vw, 360px);
-        min-height: 300px;
-      }
-
-      .geography-notes {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 20px;
-      }
-
-      .stat-row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px 10px;
-        margin-top: 26px;
-      }
-
-      .stat-item .val { font-size: 24px; }
-      .stat-item .lbl { font-size: 9px; }
-
-      /* Cards and grids */
-      .card-grid-2,
-      .card-grid-3,
-      .zone-grid,
-      .causes-grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 12px;
-      }
-
-      .card { padding: 16px; }
-      .cause-body { padding: 15px; }
-      .cause-body h3 { font-size: 15px; }
-      .cause-canvas-wrap canvas { height: 170px; }
-
-      /* Simulator controls and canvas */
-      .sim-unified-layout {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 14px;
-      }
-
-      .sim-panel {
-        padding: 14px;
-        border-radius: 10px;
-      }
-
-      .sim-panel h3 { font-size: 10px; }
-
-      .control-label {
-        gap: 10px;
-        font-size: 12px;
-      }
-
-      select {
-        min-height: 44px;
-        padding: 9px 10px;
-        font-size: 14px;
-      }
-
-      input[type=range] { height: 44px; min-height: 44px; }
-      input[type=range]::-webkit-slider-thumb {
-        width: 18px;
-        height: 18px;
-      }
-
-      #threeCanvas {
-        height: 330px;
-        min-height: 280px;
-        border-radius: 10px;
-        touch-action: none;
-      }
-
-      .sim3d-controls { gap: 5px; }
-      .ctrl-hint { font-size: 9px; }
-
-      .result-body { padding: 12px; }
-
-      .result-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-
-      .result-item { padding: 9px; }
-      .result-item .r-label { font-size: 9px; }
-      .result-item .r-val { font-size: 16px; }
-      .alert-bar { padding: 10px 12px; font-size: 12px; }
-
-      /* Map */
-      #leafletMap {
-        height: 360px;
-        min-height: 300px;
-      }
-
-      .map-filter-bar {
-        gap: 6px;
-      }
-
-      .map-filter-bar .filter-label {
-        width: 100%;
-        margin-bottom: 1px;
-      }
-
-      .map-filter-btn {
-        padding: 7px 9px;
-        min-height: 44px;
-        font-size: 10px;
-      }
-
-      .map-legend {
-        gap: 9px 12px;
-        padding: 10px;
-      }
-
-      .legend-item { font-size: 10px; }
-
-      /* Readable tables and footer */
-      .table-wrap { -webkit-overflow-scrolling: touch; }
-      table { min-width: 650px; font-size: 12px; }
-      th, td { padding: 9px 10px; }
-
-      footer {
-        padding: 20px 14px;
-        font-size: 11px;
-        overflow-wrap: anywhere;
-      }
-
-      .scroll-top {
-        width: 44px;
-        height: 44px;
-        right: 14px;
-        bottom: 14px;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .section-inner { padding-left: 11px; padding-right: 11px; }
-      .hero-content { padding-left: 0; padding-right: 0; }
-      #threeCanvas { height: 290px; }
-      .home-map #leafletMap { height: 300px; min-height: 280px; }
-      .map-filter-btn { font-size: 9px; padding: 6px 7px; min-height: 44px; }
-    }
-
-    @media (max-width: 1100px) {
-      .causes-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .zone-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .sim-unified-layout {
-        grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-      }
-    }
-
-    @media (max-width: 960px) {
-      .sim-unified-layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .sim-panel {
-        max-height: none;
-        overflow: visible;
-      }
-
-      .sim-right-col {
-        min-width: 0;
-      }
-    }
-
-    @media (max-width: 820px) {
-      nav {
-        display: block;
-        height: auto;
-        min-height: 98px;
-        padding: 7px 16px 8px;
-      }
-
-      .nav-brand {
-        height: 34px;
-      }
-
-      .nav-links {
-        display: flex;
-        width: 100%;
-        gap: 5px;
-        margin-top: 3px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 1px 2px 5px;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: var(--border) transparent;
-      }
-
-      .nav-links::-webkit-scrollbar {
-        height: 3px;
-      }
-
-      .nav-links::-webkit-scrollbar-thumb {
-        background: var(--border);
-      }
-
-      .nav-links a {
-        flex: 0 0 auto;
-        padding-inline: 10px;
-        font-size: 12px;
-      }
-
-      section[id],
-      .home-map {
-        scroll-margin-top: 112px;
-      }
-
-      #hero {
-        padding-top: 128px;
-      }
-
-      .home-layout {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 28px;
-      }
-
-      .hero-title {
-        max-width: 22ch;
-      }
-
-      .home-map #leafletMap {
-        height: clamp(340px, 58vw, 460px);
-      }
-
-      .sim-panel {
-        position: static;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .causes-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .geography-notes {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .geography-notes article {
-        max-width: none;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .section-inner {
-        padding: 34px 16px 44px;
-      }
-
-      section[id] {
-        scroll-margin-top: 108px;
-      }
-
-      #hero {
-        padding: 122px 16px 36px;
-      }
-
-      .hero-title {
-        font-size: clamp(30px, 8.6vw, 42px);
-        max-width: none;
-      }
-
-      .hero-sub {
-        font-size: 15px;
-      }
-
-      .home-map #leafletMap,
-      #leafletMap {
-        height: clamp(300px, 88vw, 380px);
-        min-height: 0;
-      }
-
-      .section-title {
-        font-size: 23px;
-      }
-
-      .section-sub {
-        font-size: 13px;
-        margin-bottom: 22px;
-      }
-
-      .cause-body {
-        padding: 17px;
-      }
-
-      #threeCanvas {
-        height: 340px;
-        min-height: 0;
-      }
-
-      .map-filter-btn {
-        font-size: 11px;
-      }
-
-      .map-legend {
-        gap: 10px 14px;
-      }
-
-      .legend-item {
-        font-size: 11px;
-      }
-
-      .zone-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .table-wrap {
-        border-radius: 6px;
-      }
-
-      footer {
-        text-align: left;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .section-inner {
-        padding-inline: 13px;
-      }
-
-      .hero-title {
-        font-size: clamp(30px, 8.6vw, 34px);
-      }
-
-      .result-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .map-filter-bar {
-        gap: 5px;
-      }
-
-      .map-filter-btn {
-        padding-inline: 8px;
-        font-size: 10px;
-      }
-    }
+@media (max-width: 1100px) {
+  :root {
+    --nav-height: 70px;
+  }
+
+  nav {
+    width: min(100% - 36px, var(--content-width));
+    gap: 14px;
+  }
+
+  .nav-links {
+    gap: 0;
+  }
+
+  .nav-links a {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+
+  .home-layout {
+    grid-template-columns: minmax(240px, 0.75fr) minmax(0, 1.25fr);
+  }
+
+  .causes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .cause-trigger canvas {
+    aspect-ratio: 2.8 / 1;
+  }
+
+  .database-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .history-timeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --nav-height: 66px;
+  }
+
+  nav {
+    position: relative;
+    width: min(100% - 32px, var(--content-width));
+    justify-content: space-between;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav-links {
+    position: absolute;
+    z-index: 110;
+    top: calc(100% + 1px);
+    right: -16px;
+    left: -16px;
+    display: none;
+    height: auto;
+    align-items: stretch;
+    padding: 8px 16px 14px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-links.is-open {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 10px;
+  }
+
+  .nav-links a {
+    min-height: 48px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+  }
+
+  .nav-links a:hover,
+  .nav-links a:focus-visible,
+  .nav-links a.active {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .nav-indicator {
+    display: none;
+  }
+
+  #hero {
+    padding: 40px 18px 48px;
+  }
+
+  .home-layout {
+    max-width: 780px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .hero-content {
+    max-width: 660px;
+  }
+
+  .hero-title {
+    max-width: 12ch;
+    font-size: clamp(3rem, 8vw, 5rem);
+  }
+
+  #leafletMap {
+    height: clamp(340px, 58vw, 480px);
+  }
+
+  .sim-unified-layout {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 14px;
+  }
+
+  .sim-panel {
+    padding: 16px;
+  }
+
+  .sim-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mitigation-layout {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: 32px;
+  }
+
+  .footer-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  html {
+    scroll-padding-top: calc(var(--nav-height) + 10px);
+  }
+
+  nav {
+    width: calc(100% - 28px);
+  }
+
+  .section-inner {
+    width: calc(100% - 36px);
+    padding-block: 60px;
+  }
+
+  #hero {
+    padding: 32px 18px 40px;
+  }
+
+  .hero-title {
+    max-width: 12ch;
+    font-size: clamp(2.65rem, 11vw, 4.2rem);
+    line-height: 1.02;
+  }
+
+  .hero-sub {
+    max-width: 34ch;
+    font-size: 17px;
+  }
+
+  .hero-ctas {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+
+  .home-map-heading {
+    font-size: 17px;
+  }
+
+  .map-filter-bar {
+    gap: 6px;
+  }
+
+  .map-filter-bar .filter-label {
+    width: 100%;
+  }
+
+  .map-filter-btn {
+    flex: 1 1 auto;
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+
+  #leafletMap {
+    height: clamp(300px, 86vw, 380px);
+  }
+
+  .map-legend {
+    gap: 8px 12px;
+    padding: 12px;
+  }
+
+  .legend-item {
+    font-size: 11px;
+  }
+
+  .causes-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .cause-trigger {
+    min-height: 0;
+  }
+
+  .cause-trigger canvas {
+    aspect-ratio: 2.3 / 1;
+  }
+
+  .cause-trigger > span:not(.sr-only) {
+    min-height: 54px;
+    padding: 12px 14px;
+    font-size: 21px;
+  }
+
+  .cause-popover,
+  .cause-card:nth-child(even) .cause-popover {
+    position: static;
+    width: auto;
+    padding: 16px;
+    border-top: 0;
+    box-shadow: none;
+  }
+
+  .sim-unified-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 22px;
+  }
+
+  .sim-panel {
+    padding: 16px;
+  }
+
+  .sim-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sim-actions .btn {
+    min-height: 48px;
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  #threeCanvas {
+    aspect-ratio: 1 / 1;
+  }
+
+  .result-body {
+    padding: 12px;
+  }
+
+  .result-item {
+    padding: 10px;
+  }
+
+  .database-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .database-filters label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .database-dialog {
+    padding: 18px;
+  }
+
+  .database-detail-list {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .database-detail-list dd {
+    margin-bottom: 10px;
+  }
+
+  .history-heading {
+    align-items: start;
+  }
+
+  .history-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+  }
+
+  .history-timeline li {
+    padding-right: 4px;
+  }
+
+  .mitigation-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .mitigation-intro p {
+    max-width: 40ch;
+  }
+
+  .mitigation-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    border-bottom: 0;
+  }
+
+  .mitigation-tab {
+    width: 100%;
+    min-height: 48px;
+    padding-inline: 12px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  .mitigation-tab[aria-pressed="true"] {
+    background: var(--surface);
+    border-color: var(--accent-strong);
+  }
+
+  .mitigation-panel li {
+    gap: 10px;
+    font-size: 15px;
+  }
+
+  .footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .footer-brand {
+    grid-column: auto;
+  }
+
+  .site-footer {
+    padding: 34px 18px 20px;
+  }
+
+  .footer-disclaimer {
+    margin-top: 24px;
+  }
+
+  .scroll-top {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media (max-width: 390px) {
+  .section-inner {
+    width: calc(100% - 28px);
+    padding-block: 48px;
+  }
+
+  #hero {
+    padding-inline: 14px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.45rem, 10.8vw, 2.85rem);
+  }
+
+  .map-filter-btn {
+    flex-basis: calc(50% - 6px);
+  }
+
+  .database-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .database-filters label:first-child {
+    grid-column: auto;
+  }
+
+  .history-heading {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .history-timeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sim-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-indicator {
+    transition: none;
+  }
+}

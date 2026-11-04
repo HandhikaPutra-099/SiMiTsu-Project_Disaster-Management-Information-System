@@ -5,10 +5,43 @@
   var sim3dCanvas, sim3dCtx, sim3dW, sim3dH;
   var currentPhase = 0, waveH = 10, autoPlayTimer = null;
   var sim3dT = 0;
-  var reduceSimulatorMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var simulatorMotionPreference = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var reduceSimulatorMotion = Boolean(simulatorMotionPreference && simulatorMotionPreference.matches);
+  var simulatorMotionPaused = reduceSimulatorMotion;
   var cam3d = { theta: 0.45, phi: 0.55, dist: 1, px: 0, py: 0 };
   var drag3d = { active: false, btn: 0, lx: 0, ly: 0 };
   var pinch3d = { active: false, dist: 0 };
+
+  function updateSimulatorMotionControl() {
+    var control = document.getElementById("simMotionToggle");
+    if (!control) return;
+    control.disabled = reduceSimulatorMotion;
+    control.setAttribute("aria-pressed", String(simulatorMotionPaused || reduceSimulatorMotion));
+    control.textContent = reduceSimulatorMotion
+      ? "Gerak dijeda oleh pengaturan perangkat"
+      : simulatorMotionPaused ? "Putar gerak 3D" : "Jeda gerak 3D";
+    var playSequence = document.getElementById("simPlaySequence");
+    if (playSequence) playSequence.disabled = reduceSimulatorMotion || simulatorMotionPaused;
+  }
+
+  function setSimulatorMotionPaused(paused) {
+    simulatorMotionPaused = paused;
+    if (paused) pauseAutoPlay3D();
+    updateSimulatorMotionControl();
+  }
+
+  if (simulatorMotionPreference) {
+    var onSimulatorMotionPreferenceChange = function(event) {
+      reduceSimulatorMotion = event.matches;
+      if (reduceSimulatorMotion) setSimulatorMotionPaused(true);
+      else updateSimulatorMotionControl();
+    };
+    if (simulatorMotionPreference.addEventListener) {
+      simulatorMotionPreference.addEventListener("change", onSimulatorMotionPreferenceChange);
+    } else {
+      simulatorMotionPreference.addListener(onSimulatorMotionPreferenceChange);
+    }
+  }
 
   // ── Simulation state — driven by updateSim() ──────────────────
   var simState = {
@@ -21,21 +54,14 @@
   function getPhaseDescriptions() {
     var s = simState;
     var coastName = {open:"pantai terbuka",bay:"teluk/muara",cliff:"tebing",mangrove:"mangrove"}[s.coast]||"pantai";
-    var timeNote = s.time==="night" ? " Skenario menggunakan waktu malam." : " Skenario menggunakan waktu siang.";
+    var timeName = s.time === "night" ? "malam" : "siang";
     var epiDist = s.dist < 50 ? "sangat dekat ("+s.dist+" km)" : s.dist < 150 ? "dekat ("+s.dist+" km)" : "jauh ("+s.dist+" km)";
-    var speedNote = "~"+s.speed+" km/jam";
     return [
-      "Kondisi ilustratif: "+coastName+" dan episentrum "+epiDist+"."+timeNote,
-
-      "Tahap ilustrasi gempa M"+s.mag.toFixed(1)+" pada kedalaman "+s.dep+" km. Visual ini tidak menentukan potensi atau tingkat ancaman di lokasi nyata.",
-
-      "Tahap ilustrasi pembentukan gelombang. Nilai pada panel adalah keluaran rumus sederhana, bukan data observasi.",
-
-      "Tahap ilustrasi propagasi dengan kecepatan model "+speedNote+". Waktu tempuh yang ditampilkan bukan estimasi waktu tiba yang dapat digunakan untuk evakuasi.",
-
-      "Tahap ilustrasi perubahan gelombang saat mendekati "+coastName+". Kondisi lokal dan dampaknya tidak dihitung secara resmi oleh simulasi ini.",
-
-      "Tahap ilustrasi gelombang mencapai pantai. Untuk ancaman nyata, ikuti perintah resmi BMKG dan BNPB."
+      "Kondisi "+coastName+", episentrum "+epiDist+", "+timeName+".",
+      "Gempa M"+s.mag.toFixed(1), "Gelombang terbentuk di atas dasar laut.",
+      "Gelombang bergerak di laut dalam, model "+s.speed+" km/jam.",
+      "Gelombang berubah saat mendekati "+coastName+".",
+      "Gelombang mencapai pantai dalam ilustrasi ini."
     ];
   }
 
@@ -43,6 +69,13 @@
   function init3DScene() {
     sim3dCanvas = document.getElementById("threeCanvas");
     if (!sim3dCanvas) return;
+    var motionToggle = document.getElementById("simMotionToggle");
+    if (motionToggle) {
+      motionToggle.addEventListener("click", function() {
+        setSimulatorMotionPaused(!simulatorMotionPaused);
+      });
+    }
+    updateSimulatorMotionControl();
 
     function resize3d() {
       sim3dW = sim3dCanvas.offsetWidth || 800;
@@ -55,10 +88,12 @@
     sim3dCtx = sim3dCanvas.getContext("2d");
     var status = document.getElementById("simulatorStatus");
     if (!sim3dCtx) {
-      if (status) status.textContent = "Simulasi visual tidak tersedia di peramban ini. Baca catatan model dan panduan mitigasi di halaman.";
+      if (status) {
+        status.hidden = false;
+        status.textContent = "Simulasi visual tidak tersedia di peramban ini.";
+      }
       return;
     }
-    if (status) status.textContent = "Simulasi siap. Visualisasi dan angka adalah ilustrasi edukatif, bukan informasi operasional.";
 
     sim3dCanvas.addEventListener("mousedown", function(e) {
       drag3d.active = true; drag3d.btn = e.button;
@@ -81,6 +116,31 @@
       cam3d.dist = Math.max(0.4, Math.min(3.0, cam3d.dist + e.deltaY * 0.001));
       e.preventDefault();
     }, {passive: false});
+    sim3dCanvas.addEventListener("keydown", function(event) {
+      var handled = true;
+      if (event.key === "ArrowLeft") {
+        if (event.shiftKey) cam3d.px -= 12;
+        else cam3d.theta -= 0.08;
+      } else if (event.key === "ArrowRight") {
+        if (event.shiftKey) cam3d.px += 12;
+        else cam3d.theta += 0.08;
+      } else if (event.key === "ArrowUp") {
+        if (event.shiftKey) cam3d.py -= 12;
+        else cam3d.phi = Math.max(0.15, cam3d.phi - 0.08);
+      } else if (event.key === "ArrowDown") {
+        if (event.shiftKey) cam3d.py += 12;
+        else cam3d.phi = Math.min(1.4, cam3d.phi + 0.08);
+      } else if (event.key === "+" || event.key === "=") {
+        cam3d.dist = Math.max(0.4, cam3d.dist - 0.1);
+      } else if (event.key === "-") {
+        cam3d.dist = Math.min(3.0, cam3d.dist + 0.1);
+      } else if (event.key === "Home") {
+        cam3d = { theta: 0.45, phi: 0.55, dist: 1, px: 0, py: 0 };
+      } else {
+        handled = false;
+      }
+      if (handled) event.preventDefault();
+    });
     sim3dCanvas.addEventListener("touchstart", function(e) {
       if (e.touches.length === 1) {
         drag3d.active = true; drag3d.btn = 0;
@@ -355,7 +415,7 @@
   function render3DLoop() {
     requestAnimationFrame(render3DLoop);
     if (!sim3dCtx) return;
-    if (!reduceSimulatorMotion) sim3dT += 0.022;
+    if (!reduceSimulatorMotion && !simulatorMotionPaused) sim3dT += 0.022;
 
     var ctx = sim3dCtx, W = sim3dW, H = sim3dH;
     var s = simState;
@@ -892,12 +952,8 @@
     document.getElementById("phaseDesc").textContent = getPhaseDescriptions()[n];
   }
 
-  function updateWaveHeight(v) {
-    waveH = parseFloat(v);
-    document.getElementById("waveHVal").textContent = v + " m";
-  }
-
   function autoPlay3D() {
+    if (reduceSimulatorMotion || simulatorMotionPaused) return;
     if (autoPlayTimer) { clearInterval(autoPlayTimer); autoPlayTimer = null; }
     var p = 0; setPhase(p);
     autoPlayTimer = setInterval(function() {

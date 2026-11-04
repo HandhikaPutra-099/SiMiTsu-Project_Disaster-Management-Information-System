@@ -9,6 +9,7 @@
     var dist  = parseFloat(document.getElementById("distSlider").value);
     var loc   = document.getElementById("locSelect").value;
     var coast = document.getElementById("coastSelect").value;
+    var time  = document.getElementById("timeSelect").value;
 
     document.getElementById("magVal").textContent  = mag.toFixed(1) + " SR";
     document.getElementById("depVal").textContent  = dep + " km";
@@ -33,13 +34,23 @@
     var waveSpeedKmh = Math.round(waveSpeedMs * 3.6);
     var eta    = Math.round(dist / Math.max(waveSpeedKmh, 1) * 60);
     var inland = (baseH * 0.25 * cFact).toFixed(1);
-    document.getElementById("alertBar").className   = "alert-bar scenario";
-    document.getElementById("alertBar").textContent  = "Skenario edukatif. Bukan peringatan resmi.";
+    simState.mag = mag;
+    simState.dep = dep;
+    simState.dist = dist;
+    simState.loc = loc;
+    simState.coast = coast;
+    simState.time = time;
+    simState.height = Number(height);
+    simState.eta = eta;
+    simState.speed = waveSpeedKmh;
+    simState.inland = Number(inland);
+    waveH = Number(height);
+
     document.getElementById("rHeight").textContent   = height + " m";
     document.getElementById("rTime").textContent     = (eta < 5 ? "<5" : "~"+eta) + " mnt";
     document.getElementById("rSpeed").textContent    = waveSpeedKmh + " km/j";
     document.getElementById("rInland").textContent   = inland + " km";
-
+    setPhase(currentPhase);
   }
 
   // ══════════════════════════════════════════════════════════════
