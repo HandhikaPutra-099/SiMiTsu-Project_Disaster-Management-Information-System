@@ -3599,3 +3599,202 @@ body,
     transition: none;
   }
 }
+
+/* ── Onda-inspired editorial refinement ─────────────────────
+   Keeps the SiMiTsu palette while giving each learning step a
+   distinct surface, stronger hierarchy, and calmer reading rhythm. */
+:root {
+  --paper: #f3f7f8;
+  --paper-blue: #e6f1f4;
+  --ink: #082235;
+  --ink-muted: #496273;
+  --line-light: #c6d8de;
+  --orange-deep: #c95610;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.site-header {
+  position: relative;
+  z-index: 20;
+}
+
+.announcement-bar {
+  min-height: 34px;
+  padding-inline: clamp(18px, 4vw, 56px);
+  background: var(--caution);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: .02em;
+}
+
+.announcement-bar > a {
+  color: #fff;
+  font-weight: 700;
+}
+
+.site-header nav {
+  min-height: 74px;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+  background: rgba(7,24,39,.93);
+}
+
+.nav-primary-action,
+.btn {
+  min-height: 46px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.nav-primary-action {
+  padding-inline: 18px;
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.nav-primary-action:hover { background: var(--accent-soft); color: var(--ink); }
+
+#hero {
+  min-height: min(760px, 88svh);
+  background: var(--bg);
+}
+
+.home-layout {
+  min-height: min(760px, 88svh);
+  grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr);
+  gap: clamp(36px, 7vw, 108px);
+  padding-top: 108px;
+  padding-bottom: 64px;
+}
+
+.hero-content { max-width: 580px; }
+.hero-kicker,
+.hero-visual-kicker,
+.cause-tag,
+.mitigation-kicker,
+.map-context-kicker {
+  letter-spacing: .14em;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.hero-title {
+  max-width: 12ch;
+  font-size: clamp(48px, 6vw, 78px);
+  line-height: .98;
+}
+
+.hero-sub { max-width: 47ch; color: #d7e6ec; }
+.hero-visual {
+  border-color: rgba(131,231,239,.35);
+  border-radius: 24px;
+  background: rgba(8,34,53,.76);
+  box-shadow: 0 24px 80px rgba(0,0,0,.2);
+}
+
+.info-strip { background: #0b3145; border-color: #1e566d; }
+
+.education-section,
+.database-section,
+#mitigation {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.education-section .section-sub,
+.database-section .section-sub,
+#mitigation .section-sub { color: var(--ink-muted); }
+
+.section-inner { padding-block: clamp(72px, 9vw, 128px); }
+.section-heading,
+.education-header { margin-bottom: 56px; }
+.section-title {
+  max-width: 16ch;
+  color: var(--ink);
+  font-size: clamp(36px, 4.6vw, 64px);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+.section-sub { max-width: 60ch; font-size: 16px; line-height: 1.8; }
+
+.cause-featured {
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+  gap: clamp(32px, 7vw, 96px);
+  padding-bottom: 56px;
+  border-color: var(--line-light);
+}
+.cause-featured-visual canvas,
+.cause-card { border-color: var(--line-light); }
+.cause-featured-body { padding-top: 20px; }
+.cause-featured-body h3,
+.cause-body h3 { color: var(--ink); font-size: clamp(25px, 3vw, 38px); letter-spacing: -.04em; }
+.cause-featured-body p:not(.cause-tag),
+.cause-info p { color: var(--ink-muted); }
+.cause-example { background: var(--paper-blue); color: var(--ink-muted); border-left-color: var(--caution); }
+.cause-index-list { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+.cause-row { display: block; padding: 0; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 28px rgba(8,34,53,.06); }
+.cause-row .cause-canvas-wrap { border-bottom-color: var(--line-light); background: var(--ink); }
+.cause-row .cause-body { padding: 22px; }
+.cause-row .cause-body h3 { font-size: 22px; }
+.cause-control { border-color: var(--line-light); background: var(--paper-blue); color: var(--ink); border-radius: 999px; }
+.cause-control:hover { border-color: var(--accent); background: #fff; }
+.cause-info summary { color: var(--orange-deep); font-weight: 700; }
+
+.map-section,
+.simulator-section { background: var(--bg); color: var(--text); }
+.map-section .section-title,
+.simulator-section .section-title { color: var(--text); }
+.map-section .section-sub,
+.simulator-section .section-sub { color: #b9d0da; }
+.map-workspace { grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr); gap: 24px; }
+.map-main,
+.map-context { border-radius: 20px; border-color: #294c60; }
+.map-context { padding: 24px; background: #0b2638; }
+.map-context h3 { color: var(--text); font-size: 28px; letter-spacing: -.04em; }
+.map-event-note { border-color: #31576b; background: #102f43; }
+.map-event-note a { color: var(--accent-soft); }
+
+.sim-unified-layout { gap: 32px; }
+.sim-canvas-frame { border-radius: 20px; border-color: #31576b; }
+.sim-panel { padding-left: 28px; }
+.sim-data-panel { border-radius: 16px; border-color: #31576b; }
+
+.database-table-wrap,
+.archive-analytics { border-color: var(--line-light); }
+.archive-analytics { padding: 24px; border-radius: 18px; background: #fff; }
+.database-filters input,
+.database-filters select { min-height: 46px; border-color: var(--line-light); background: #fff; color: var(--ink); }
+.database-table th { background: var(--ink); color: #fff; }
+.database-table td { background: #fff; color: var(--ink); border-color: var(--line-light); }
+
+#mitigation .mitigation-phase { background: #fff; border-color: var(--line-light); border-radius: 18px; }
+#mitigation .mitigation-phase h3 { color: var(--ink); }
+#mitigation .mitigation-phase p { color: var(--ink-muted); }
+
+.site-footer { background: var(--ink); }
+.site-footer a:hover { color: var(--accent-soft); }
+
+@media (max-width: 920px) {
+  .home-layout { grid-template-columns: 1fr; }
+  .hero-content { max-width: 680px; }
+  .hero-title { max-width: 14ch; }
+  .cause-featured { grid-template-columns: 1fr; }
+  .cause-index-list { grid-template-columns: 1fr; }
+  .map-workspace { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .announcement-bar { padding-block: 8px; }
+  .site-header nav { min-height: 64px; }
+  .home-layout { padding-top: 102px; }
+  .hero-title { font-size: clamp(44px, 14vw, 64px); }
+  .hero-visual { border-radius: 18px; }
+  .section-inner { padding-block: 72px; }
+  .section-heading, .education-header { margin-bottom: 36px; }
+  .section-title { font-size: clamp(35px, 12vw, 52px); }
+  .sim-panel { padding-left: 0; border-left: 0; }
+}
